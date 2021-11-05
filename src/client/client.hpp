@@ -16,7 +16,7 @@ class Client {
 
     public:
         Client(void);
-        Client(int fd, struct sockaddr_storage remoteAddr, char *remoteIp);
+        Client(int fd, struct sockaddr_storage remoteAddr);
         ~Client(void);
 
 };

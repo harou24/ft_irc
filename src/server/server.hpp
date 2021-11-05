@@ -5,6 +5,7 @@
 
 # include "../client/client.hpp"
 
+# define MAX_CLIENTS 30
 # define MAX_PENDING_CONNECTION 10
 
 class Server {
@@ -12,12 +13,14 @@ class Server {
     private:
         std::vector<Client> clients;
         fd_set              master;
-        fd_set              readsFds;
+        fd_set              readFds;
         int                 listener;
         int                 fdMax;
+        const char          *port;
 
     public:
         Server(void);
+        Server(const char *port);
         ~Server(void);
         
         void    init(void);
