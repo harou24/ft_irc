@@ -111,3 +111,8 @@ void    Server::handleClientData(Client cl)
         printf("DATA from Client->%s\n", buf);
     }
 }
+
+void    Server::start(void)
+{
+    
+}
