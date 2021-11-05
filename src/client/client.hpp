@@ -1,9 +1,13 @@
 #ifndef CLIENT_HPP
 # define CLIENT_HPP
 
-#define MAX_BUFF_SIZE 256
+# define MAX_BUFF_SIZE 256
+
+# include <sys/socket.h>
+# include <netinet/in.h>
 
 class Client {
+
    private:
         int                     fd;
         struct sockaddr_storage remoteAddr;
@@ -14,7 +18,6 @@ class Client {
         Client(void);
         Client(int fd, struct sockaddr_storage remoteAddr, char *remoteIp);
         ~Client(void);
-
 
 };
 
