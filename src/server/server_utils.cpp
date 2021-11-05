@@ -1,5 +1,9 @@
 #include "server_utils.hpp"
+
 #include <string.h>
+#include <stdlib.h>
+
+#include <iostream>
 
 void    *getInAddr(struct sockaddr *sa)
 {
@@ -35,4 +39,10 @@ void    addFdToSet(int fd, fd_set *set)
 void    removeFdFromSet(int fd, fd_set *set)
 {
     FD_CLR(fd, set);
+}
+
+void    dieWithMsg(const char *msg)
+{
+    std::cout << msg << std::endl;
+    exit(EXIT_FAILURE);
 }

@@ -1,7 +1,7 @@
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
-# include <vector>
+# include <map>
 
 # include "../client/client.hpp"
 
@@ -11,12 +11,12 @@
 class Server {
 
     private:
-        std::vector<Client> clients;
-        fd_set              master;
-        fd_set              readFds;
-        int                 listener;
-        int                 fdMax;
-        const char          *port;
+        std::map<int, Client>   clients;
+        fd_set                  master;
+        fd_set                  readFds;
+        int                     listener;
+        int                     fdMax;
+        const char              *port;
 
     public:
         Server(void);
@@ -24,9 +24,9 @@ class Server {
         ~Server(void);
         
         void    init(void);
-        void    run(void);
+        void    start(void);
         void    handleNewClient(void);
-        void    handleClientData(void);
+        void    handleClientData(Client cl);
 
 };
 

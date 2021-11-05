@@ -4,16 +4,41 @@
 Client::Client(void)
 {
     this->fd = -1;
-    memset(this->dataBuffer, 0, sizeof(char) * MAX_BUFF_SIZE);
-    memset(this->remoteIP, 0, sizeof(char) * MAX_BUFF_SIZE);
 }
 
-Client::Client(int fd, struct sockaddr_storage remoteAddr)
+Client::Client(int fd, std::string ip)
 {
     this->fd = fd;
-    this->remoteAddr = remoteAddr;
-    memset(this->dataBuffer, 0, sizeof(char) * MAX_BUFF_SIZE);
-    memset(this->remoteIP, 0, sizeof(char) * MAX_BUFF_SIZE);
+    this->ip = ip;
 }
 
 Client::~Client(void){ }
+
+int     Client::getFd(void) const
+{
+    return (this->fd);
+}
+
+std::string    Client::getIP(void) const
+{
+    return (this->ip);
+}
+
+std::string    Client::getDataBuffer(void) const
+{
+    return (this->dataBuffer);
+}
+
+void            Client::setDataBuffer(std::string data)
+{
+    this->dataBuffer = data;
+}
+
+std::ostream &operator<<(std::ostream &output , const Client &cl)
+{
+	output << "Client {\n";
+    output << "fd: " << cl.getFd() << std::endl;
+    output << "IP: " << cl.getIP() << std::endl;
+    output << "dataBuffer: " << cl.getDataBuffer() << "\n}" << std::endl;
+	return (output);
+}

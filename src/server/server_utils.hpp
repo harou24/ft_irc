@@ -11,5 +11,6 @@ void    zeroFdSet(fd_set *set);
 bool    isFdInSet(int fd, fd_set *set);
 void    addFdToSet(int fd, fd_set *set);
 void    removeFdFromSet(int fd, fd_set *set);
+void    dieWithMsg(const char *msg);
 
 #endif
