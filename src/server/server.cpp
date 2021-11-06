@@ -84,8 +84,9 @@ void    Server::handleNewClient(void)
         inet_ntop(remoteaddr.ss_family, getInAddr((struct sockaddr*)&remoteaddr), remoteIP, INET6_ADDRSTRLEN);
         std::string ip(remoteIP);
         Client cl(newfd, ip);
+        cl.setConnected(true);
         this->clients.insert(std::pair<int, Client>(newfd, cl));
-        std::cout << "New connection\n" << cl << std::endl;
+        std::cout << "New connection ..." << std::endl;
         write(newfd, "HelloFromServer\n", 17);
     }
 }
@@ -121,7 +122,10 @@ void    Server::handleClientData(int fd)
     if ((nbytes = recv(cl.getFd(), buf, sizeof buf, 0)) <= 0)
     {
         if (nbytes == 0)
-            std::cout << cl << "DISCONNECTED\n";
+        {
+            cl.setConnected(false);
+            std::cout << "Client has been disconected !\n"<< cl;
+        }
         else
             std::cerr << "recv() error @_@\n";
         handleClientRemoval(this->getClient(fd));
@@ -130,7 +134,7 @@ void    Server::handleClientData(int fd)
     {
         std::string data(buf);
         cl.setDataBuffer(data);
-        printf("DATA from Client->%s\n", buf);
+        std::cout << cl;
     }
 }
 

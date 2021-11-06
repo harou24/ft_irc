@@ -29,6 +29,7 @@ class Server {
         void    handleNewClient(void);
         void    handleClientData(int fd);
         void    handleClientRemoval(Client cl);
+
         void    removeClient(Client cl);
 
         void    setFdMax(int newFdMax);

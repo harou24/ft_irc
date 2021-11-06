@@ -11,6 +11,7 @@
 class Client {
 
    private:
+        bool                    connected;
         int                     fd;
         std::string             ip;
         std::string             dataBuffer;
@@ -23,8 +24,10 @@ class Client {
         int                     getFd(void) const;
         std::string             getDataBuffer(void) const;
         std::string             getIP(void) const;
+        bool                    isConnected(void) const;
 
         void                    setDataBuffer(std::string data);
+        void                    setConnected(bool status);
 };
 
 std::ostream &operator << (std::ostream &output, const Client &cl);
