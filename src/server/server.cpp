@@ -15,12 +15,13 @@ Server::Server(void)
 
 Server::Server(const char *port): port(port)
 {
-    this->port = port;
     zeroFdSet(&this->master);
     zeroFdSet(&this->readFds);
     this->listener = -1;
     this->fdMax = 0;
 }
+
+Server::~Server(void) { }
 
 void    Server::initTcpConnection(void)
 {
@@ -54,6 +55,8 @@ void    Server::initTcpConnection(void)
         dieWithMsg("bind() error @_@\n");
     if (listen(this->listener, MAX_PENDING_CONNECTION) == -1)
         dieWithMsg("listen() error @_@\n");
+    addFdToSet(this->listener, &this->master);
+    this->setFdMax(this->listener);
 }
 
 void    Server::setFdMax(int newFd)
@@ -82,7 +85,16 @@ void    Server::handleNewClient(void)
         std::string ip(remoteIP);
         Client cl(newfd, ip);
         this->clients.insert(std::pair<int, Client>(newfd, cl));
+        std::cout << "New connection\n" << cl << std::endl;
+        write(newfd, "HelloFromServer\n", 17);
     }
+}
+
+Client    Server::getClient(int fd)
+{
+    std::map<int, Client>::iterator it;
+    it = this->clients.find(fd);
+    return(it->second);
 }
 
 void    Server::removeClient(Client cl)
@@ -99,17 +111,20 @@ void    Server::handleClientRemoval(Client cl)
         this->removeClient(cl);
 }
 
-void    Server::handleClientData(Client cl)
+void    Server::handleClientData(int fd)
 {
     int nbytes;
     char buf[256];
 
+    Client cl = getClient(fd);
+    
     if ((nbytes = recv(cl.getFd(), buf, sizeof buf, 0)) <= 0)
     {
         if (nbytes == 0)
-            std::cout << cl << std::endl << "DISCONNECTED\n";
+            std::cout << cl << "DISCONNECTED\n";
         else
             std::cerr << "recv() error @_@\n";
+        handleClientRemoval(this->getClient(fd));
     }
     else
     {
@@ -121,5 +136,20 @@ void    Server::handleClientData(Client cl)
 
 void    Server::start(void)
 {
-    
+    while (true)
+    {
+        this->readFds = this->master;
+        if (select(this->fdMax + 1, &this->readFds, NULL, NULL, NULL) == -1)
+            dieWithMsg("select() error @_@\n");
+        for(int fd = 0; fd <= this->fdMax; fd++)
+        {
+            if (isFdInSet(fd, &this->readFds))
+            { 
+                if (fd == this->listener)
+                    this->handleNewClient();
+                else
+                    this->handleClientData(fd);
+            }
+        }
+    }
 }

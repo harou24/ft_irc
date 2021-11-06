@@ -4,6 +4,8 @@
 
 int     main(void)
 {
-    std::cout << "Hello World !\n";
+    Server s("8080");
+    s.initTcpConnection();
+    s.start();
     return (0);
 }

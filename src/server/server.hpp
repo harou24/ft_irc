@@ -25,11 +25,15 @@ class Server {
         
         void    initTcpConnection(void);
         void    start(void);
+
         void    handleNewClient(void);
-        void    handleClientData(Client cl);
+        void    handleClientData(int fd);
         void    handleClientRemoval(Client cl);
+        void    removeClient(Client cl);
 
         void    setFdMax(int newFdMax);
+
+        Client  getClient(int fd);
 };
 
 

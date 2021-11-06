@@ -37,8 +37,8 @@ void            Client::setDataBuffer(std::string data)
 std::ostream &operator<<(std::ostream &output , const Client &cl)
 {
 	output << "Client {\n";
-    output << "fd: " << cl.getFd() << std::endl;
-    output << "IP: " << cl.getIP() << std::endl;
-    output << "dataBuffer: " << cl.getDataBuffer() << "\n}" << std::endl;
+    output << "          FD:   " << cl.getFd() << std::endl;
+    output << "          IP:   " << cl.getIP() << std::endl;
+    output << "          DATA: " << cl.getDataBuffer() << "\n}" << std::endl;
 	return (output);
 }
