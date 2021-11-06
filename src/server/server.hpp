@@ -23,11 +23,13 @@ class Server {
         Server(const char *port);
         ~Server(void);
         
-        void    init(void);
+        void    initTcpConnection(void);
         void    start(void);
         void    handleNewClient(void);
         void    handleClientData(Client cl);
+        void    handleClientRemoval(Client cl);
 
+        void    setFdMax(int newFdMax);
 };
 
 

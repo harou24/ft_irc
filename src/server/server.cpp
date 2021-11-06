@@ -22,7 +22,7 @@ Server::Server(const char *port): port(port)
     this->fdMax = 0;
 }
 
-void    Server::init(void)
+void    Server::initTcpConnection(void)
 {
     struct addrinfo hints;
     struct addrinfo *ai;
@@ -56,11 +56,10 @@ void    Server::init(void)
         dieWithMsg("listen() error @_@\n");
 }
 
-void    Server::start(void)
+void    Server::setFdMax(int newFd)
 {
-    this->init();
-
-
+    if (newFd > this->fdMax)
+        this->fdMax = newFd;
 }
 
 void    Server::handleNewClient(void)
@@ -78,13 +77,26 @@ void    Server::handleNewClient(void)
     else
     {
         addFdToSet(newfd, &this->master);
-        if (newfd > this->fdMax)
-            this->fdMax = newfd;
+        this->setFdMax(newfd);
         inet_ntop(remoteaddr.ss_family, getInAddr((struct sockaddr*)&remoteaddr), remoteIP, INET6_ADDRSTRLEN);
         std::string ip(remoteIP);
         Client cl(newfd, ip);
         this->clients.insert(std::pair<int, Client>(newfd, cl));
     }
+}
+
+void    Server::removeClient(Client cl)
+{
+        std::map<int, Client>::iterator it;
+        it = this->clients.find(cl.getFd());
+        this->clients.erase(it);
+}
+
+void    Server::handleClientRemoval(Client cl)
+{
+        close(cl.getFd());
+        removeFdFromSet(cl.getFd(), &this->master);
+        this->removeClient(cl);
 }
 
 void    Server::handleClientData(Client cl)
@@ -98,11 +110,6 @@ void    Server::handleClientData(Client cl)
             std::cout << cl << std::endl << "DISCONNECTED\n";
         else
             std::cerr << "recv() error @_@\n";
-        close(cl.getFd());
-        removeFdFromSet(cl.getFd(), &this->master);
-        std::map<int, Client>::iterator it;
-        it = clients.find(cl.getFd());
-        clients.erase(it);
     }
     else
     {
