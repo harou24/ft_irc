@@ -9,6 +9,7 @@ INCLUDE  := -Iinclude/
 SRC      :=                      \
    $(wildcard src/server/*.cpp) \
    $(wildcard src/client/*.cpp) \
+   $(wildcard src/tcp_connection/*.cpp) \
    $(wildcard src/*.cpp)         \
 
 OBJECTS  := $(SRC:%.cpp=$(OBJ_DIR)/%.o)

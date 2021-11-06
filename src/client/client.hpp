@@ -26,6 +26,8 @@ class Client {
         std::string             getIP(void) const;
         bool                    isConnected(void) const;
 
+        void                    setIP(std::string newIP);
+        void                    setFd(int newFd);
         void                    setDataBuffer(std::string data);
         void                    setConnected(bool status);
 };

@@ -48,6 +48,16 @@ void            Client::setConnected(bool status)
     this->connected = status;
 }
 
+void            Client::setIP(std::string newIP)
+{
+    this->ip = newIP;
+}
+
+void            Client::setFd(int newFd)
+{
+    this->fd = newFd;
+}
+
 std::ostream &operator << (std::ostream &output , const Client &cl)
 {
 	output << "Client {\n";
