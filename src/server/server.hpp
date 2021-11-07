@@ -24,6 +24,7 @@ class Server : public TcpConnection {
         void    handleNewClient(void);
         void    handleClientData(int fd);
         void    handleClientRemoval(Client cl);
+        void    sendGreetingMsg(const Client &cl);
 
         void    removeClient(Client cl);
 

@@ -4,11 +4,18 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 
+#define WELCOME_MSG "------- Welcome to the server ! -------\n"
+
 Server::Server(void): TcpConnection("8080") { }
 
 Server::Server(const char *port): TcpConnection(port) { }
 
 Server::~Server(void) { }
+
+void    Server::sendGreetingMsg(const Client &cl)
+{
+    write(cl.getFd(), WELCOME_MSG, sizeof(WELCOME_MSG));
+}
 
 void    Server::handleNewClient(void)
 {
@@ -21,7 +28,7 @@ void    Server::handleNewClient(void)
     {
         std::cerr << e.what() << std::endl;
     }
-    write(cl.getFd(), "HelloFromServer\n", 17);
+    sendGreetingMsg(cl);
     std::cout << cl;
     this->clients.insert(std::pair<int, Client>(cl.getFd(), cl));
 }
@@ -89,7 +96,7 @@ void    Server::start(void)
         for(int fd = 0; fd <= this->getFdMax(); fd++)
         {
 
-            if (isFdInSet(fd, this->getReadFds()))
+            if (isFdReadyForCommunication(fd))
             {
                 if (fd == this->getListenerFd())
                     this->handleNewClient();

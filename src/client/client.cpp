@@ -3,6 +3,8 @@
 
 #include <string.h>
 
+#include<sstream>
+
 Client::Client(void)
 {
     this->fd = -1;
@@ -68,7 +70,16 @@ std::ostream &operator << (std::ostream &output , const Client &cl)
     output << "          FD:        " << cl.getFd() << std::endl;
     output << "          IP:        " << cl.getIP() << std::endl;
     if (!cl.getDataBuffer().empty())
-        output << "          DATA:      " << cl.getDataBuffer().c_str();
+    {
+        std::istringstream ss(cl.getDataBuffer());
+        std::string del;
+        output << "          DATA:      ";
+        getline(ss, del, '\n');
+        output << del << '\n';
+        while(getline(ss, del, '\n'))
+            output << "                     " << del << '\n';
+    
+    }    
     output << "}" << std::endl << std::endl;
 	return (output);
 }
