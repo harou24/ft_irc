@@ -1,4 +1,4 @@
-#include "server/server.hpp"
+#include "../src/server/server.hpp"
 
 #include <iostream>
 
