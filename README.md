@@ -6,5 +6,5 @@ Internet Relay Chat implementation in c++
 </p>
 
 # CI
-[![macos](https://github.com/harou24/ft_irc/workflows/MacOS/badge.svg)](https://github.com/harou24/ft_irc/actions?workflow=MacOS)
-[![ubuntu](https://github.com/harou24/ft_irc/workflows/Linux/badge.svg)](https://github.com/harou24/ft_irc/actions?workflow=ubuntu)
+[![macOS](https://github.com/harou24/ft_irc/actions/workflows/macos.yml/badge.svg)](https://github.com/harou24/ft_irc/actions/workflows/macos.yml)
+[![ubuntu](https://github.com/harou24/ft_irc/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/harou24/ft_irc/actions/workflows/ubuntu.yml)
