@@ -1,4 +1,5 @@
 #include "tcp_utils.hpp"
+#include "tcp_exceptions.hpp"
 
 #include <string.h>
 #include <stdlib.h>
@@ -53,4 +54,14 @@ void    dieWithMsg(const char *msg)
 {
     std::cout << msg << std::endl;
     exit(EXIT_FAILURE);
+}
+
+int     assignAddrToFd(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
+{
+    return(bind(sockfd, addr, addrlen));
+}
+
+int     connectFdToAddr(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
+{
+    return (connect(sockfd, addr, addrlen));
 }

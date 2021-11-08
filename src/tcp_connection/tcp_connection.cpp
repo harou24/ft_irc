@@ -27,33 +27,57 @@ TcpConnection::TcpConnection(const char *port) : port(port)
 
 TcpConnection::~TcpConnection(void) { }
 
-void    TcpConnection::init(void)
+int     TcpConnection::assignAddrToListenerFd(int sockFd, const struct sockaddr *addr, socklen_t addrlen)
 {
-    struct addrinfo hints;
-    struct addrinfo *ai;
-    struct addrinfo *p;
-    int             rv;
-    int             yes = 1;
+    const bool  enable = true;
+    setsockopt(this->listenerFd, SOL_SOCKET, SO_REUSEADDR, (const void *)&enable, sizeof(int));
+    return(assignAddrToFd(sockFd, addr, addrlen));
+}
 
-    setSockAddrConfig(&hints);
-    if ((rv = getAddrInfo(NULL, this->port, &hints, &ai)) != 0)
-        throw TcpGetAddrInfoException(gai_strerror(rv));
-    for(p = ai; p != NULL; p = p->ai_next)
+int     TcpConnection::findFd(e_fdType type, struct addrinfo *addresses)
+{
+    t_ptrToFunction function = NULL;
+    
+    if (type == TO_LISTEN)
+        function = &assignAddrToFd;
+    else if(type == TO_CONNECT)
+        function = &connectFdToAddr;
+    return(this->applyFunctionToAddresses(function, addresses));
+}
+
+int    TcpConnection::applyFunctionToAddresses(t_ptrToFunction function, struct addrinfo *addresses)
+{
+    struct addrinfo     *tmpAddrInfo;
+    int                 fd;
+
+    for(tmpAddrInfo = addresses; tmpAddrInfo != NULL; tmpAddrInfo = tmpAddrInfo->ai_next)
     {
-        this->listenerFd = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
-        if (this->listenerFd < 0)
+        fd = socket(tmpAddrInfo->ai_family, tmpAddrInfo->ai_socktype, tmpAddrInfo->ai_protocol);
+        if (fd < 0)
             continue;
-        setsockopt(this->listenerFd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
-        if (bind(this->listenerFd, p->ai_addr, p->ai_addrlen) < 0)
+        if (function(fd, tmpAddrInfo->ai_addr, tmpAddrInfo->ai_addrlen) < 0)
         {
-            close(this->listenerFd);
+            close(fd);
             continue;
         }
         break;
     }
-    freeaddrinfo(ai);
-    if (p == NULL)
+    if (tmpAddrInfo == NULL)
         dieWithMsg("bind() error @_@\n");
+    return (fd);
+}
+
+void    TcpConnection::init(void)
+{
+    struct addrinfo     hints;
+    struct addrinfo     *addrInfo;
+    int                 ret;
+
+    setSockAddrConfig(&hints);
+    if ((ret = getAddrInfo(NULL, this->port, &hints, &addrInfo)) != 0)
+        throw TcpGetAddrInfoException(gai_strerror(ret));
+    this->listenerFd = this->findFd(TO_LISTEN, addrInfo);
+    freeaddrinfo(addrInfo);
     if (listen(this->listenerFd, MAX_PENDING_CONNECTION) == -1)
         dieWithMsg("listen() error @_@\n");
     addFdToSet(this->listenerFd, &this->masterFds);
@@ -94,9 +118,7 @@ std::string TcpConnection::getDataFromFd(int fd)
     if ((nbytes = recv(fd, buf, sizeof buf, 0)) <= 0)
     {
         if (nbytes == 0)
-        {
             std::cout << "TCP Connection lost !\n";
-        }
         else
             std::cerr << "recv() error @_@\n";
     }

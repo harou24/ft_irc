@@ -10,6 +10,7 @@ class TcpConnection {
         fd_set      readFds;
         int         listenerFd;
         int         fdMax;
+        enum e_fdType{ TO_CONNECT, TO_LISTEN };
 
     public:
         TcpConnection(void);
@@ -18,8 +19,14 @@ class TcpConnection {
 
         void            init(void);
         void            acceptClientConnection(Client &cl);
+        int             assignAddrToListenerFd(int sockFd, const struct sockaddr *addr, socklen_t addrlen);
         std::string     getDataFromFd(int fd);
-        void            updateFdsInSet();
+        void            updateFdsInSet(void);
+
+        typedef         int (*t_ptrToFunction)(int, const struct sockaddr*, socklen_t);
+        int             applyFunctionToAddresses(t_ptrToFunction function, struct addrinfo *addresses);
+        
+        int             findFd(e_fdType type, struct addrinfo *addresses);
 
         fd_set          *getMasterFds(void);
         fd_set          *getReadFds(void);

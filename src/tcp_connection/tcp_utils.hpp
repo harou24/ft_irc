@@ -17,4 +17,8 @@ int     getAddrInfo(const char *hostname,
                         const char *servname,
                             const struct addrinfo *hints, 
                                     struct addrinfo **res);
+
+int     assignAddrToFd(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+int     connectFdToAddr(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+
 #endif
