@@ -2,6 +2,7 @@
 #include "../server/server_utils.hpp"
 
 #include <unistd.h>
+#include <stdlib.h>
 #include <arpa/inet.h>
 
 #define MAX_PENDING_CONNECTION 10
@@ -36,7 +37,7 @@ void    TcpConnection::init(void)
     setSockAddrConfig(&hints);
     if ((rv = getaddrinfo(NULL, this->port, &hints, &ai)) != 0)
     {
-        fprintf(stderr, "selectserver: %s\n", gai_strerror(rv));
+    	std::cout << "getaddrinfo() failed !\n" << gai_strerror(rv) << std::endl;
         exit(EXIT_FAILURE);
     }
     for(p = ai; p != NULL; p = p->ai_next)
