@@ -28,9 +28,9 @@ class TcpConnection {
         int             getListenerFd(void) const;
         int             getFdMax(void) const;
 
-        void            setFdMax(int newMax);
+        void            setFdMax(const int newMax);
 
-        bool            isFdReadyForCommunication(int fd);
+        bool            isFdReadyForCommunication(const int fd);
 
         class TcpAcceptException : public std::exception
 			{

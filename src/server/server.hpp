@@ -22,13 +22,13 @@ class Server : public TcpConnection {
         void    start(void);
 
         void    handleNewClient(void);
-        void    handleClientData(int fd);
-        void    handleClientRemoval(Client cl);
-        void    sendGreetingMsg(const Client &cl);
+        void    handleClientData(const int fd);
+        void    handleClientRemoval(const Client &cl);
+        void    sendGreetingMsg(const Client &cl) const;
 
-        void    removeClient(Client cl);
+        void    removeClient(const Client &cl);
 
-        Client  getClient(int fd);
+        Client  getClient(const int fd);
 };
 
 

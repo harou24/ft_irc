@@ -1,8 +1,6 @@
 #ifndef CLIENT_HPP
 # define CLIENT_HPP
 
-# define MAX_BUFF_SIZE 256
-
 # include <sys/socket.h>
 # include <netinet/in.h>
 
@@ -14,22 +12,22 @@ class Client {
         bool                    connected;
         int                     fd;
         std::string             ip;
-        std::string             dataBuffer;
+        std::string             data;
 
     public:
         Client(void);
-        Client(int fd, std::string ip);
+        Client(const int fd, const std::string &ip);
         ~Client(void);
         
         int                     getFd(void) const;
-        std::string             getDataBuffer(void) const;
-        std::string             getIP(void) const;
+        std::string             getData(void) const;
+        std::string             getIp(void) const;
         bool                    isConnected(void) const;
 
-        void                    setIP(std::string newIP);
-        void                    setFd(int newFd);
-        void                    setDataBuffer(std::string data);
-        void                    setConnected(bool status);
+        void                    setIp(const std::string &newIp);
+        void                    setFd(const int newFd);
+        void                    setData(const std::string &data);
+        void                    setConnected(const bool status);
 };
 
 std::ostream &operator << (std::ostream &output, const Client &cl);
