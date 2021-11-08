@@ -1,5 +1,5 @@
-#ifndef SERVER_UTILS_HPP
-# define SERVER_UTILS_HPP
+#ifndef TCP_UTILS_HPP
+# define TCP_UTILS_HPP
 
 #include <netinet/in.h>
 #include <sys/select.h>

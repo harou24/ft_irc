@@ -15,6 +15,6 @@ add_subdirectory(tests)
 
 add_executable(server.out app/main.cpp
                 src/server/server.cpp
-                src/server/server_utils.cpp
+                src/tcp_connection/tcp_utils.cpp
                 src/client/client.cpp
                 src/tcp_connection/tcp_connection.cpp)
