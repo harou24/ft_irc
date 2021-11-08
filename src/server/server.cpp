@@ -12,7 +12,7 @@ Server::Server(const char *port): TcpConnection(port) { }
 
 Server::~Server(void) { }
 
-void    Server::sendGreetingMsg(const Client &cl)
+void    Server::sendGreetingMsg(const Client &cl) const
 {
     write(cl.getFd(), WELCOME_MSG, sizeof(WELCOME_MSG));
 }
@@ -33,28 +33,28 @@ void    Server::handleNewClient(void)
     this->clients.insert(std::pair<int, Client>(cl.getFd(), cl));
 }
 
-Client    Server::getClient(int fd)
+Client    Server::getClient(const int fd)
 {
     std::map<int, Client>::iterator it;
     it = this->clients.find(fd);
     return(it->second);
 }
 
-void    Server::removeClient(Client cl)
+void    Server::removeClient(const Client &cl)
 {
         std::map<int, Client>::iterator it;
         it = this->clients.find(cl.getFd());
         this->clients.erase(it);
 }
 
-void    Server::handleClientRemoval(Client cl)
+void    Server::handleClientRemoval(const Client &cl)
 {
         close(cl.getFd());
         removeFdFromSet(cl.getFd(), this->getMasterFds());
         this->removeClient(cl);
 }
 
-void    Server::handleClientData(int fd)
+void    Server::handleClientData(const int fd)
 {
     std::string data;
 
@@ -75,7 +75,7 @@ void    Server::handleClientData(int fd)
     }
     else
     {
-        cl.setDataBuffer(data);
+        cl.setData(data);
     }
     std::cout << cl;
 }

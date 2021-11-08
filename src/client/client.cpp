@@ -11,7 +11,7 @@ Client::Client(void)
     this->connected = false;
 }
 
-Client::Client(int fd, std::string ip)
+Client::Client(const int fd, const std::string &ip)
 {
     this->fd = fd;
     this->ip = ip;
@@ -25,19 +25,19 @@ int     Client::getFd(void) const
     return (this->fd);
 }
 
-std::string    Client::getIP(void) const
+std::string    Client::getIp(void) const
 {
     return (this->ip);
 }
 
-std::string    Client::getDataBuffer(void) const
+std::string    Client::getData(void) const
 {
-    return (this->dataBuffer);
+    return (this->data);
 }
 
-void            Client::setDataBuffer(std::string data)
+void            Client::setData(const std::string &data)
 {
-    this->dataBuffer.assign(data);
+    this->data.assign(data);
 }
 
 bool            Client::isConnected(void) const
@@ -45,17 +45,17 @@ bool            Client::isConnected(void) const
     return (this->connected);
 }
 
-void            Client::setConnected(bool status)
+void            Client::setConnected(const bool status)
 {
     this->connected = status;
 }
 
-void            Client::setIP(std::string newIP)
+void            Client::setIp(const std::string &newIp)
 {
-    this->ip = newIP;
+    this->ip = newIp;
 }
 
-void            Client::setFd(int newFd)
+void            Client::setFd(const int newFd)
 {
     this->fd = newFd;
 }
@@ -68,10 +68,10 @@ std::ostream &operator << (std::ostream &output , const Client &cl)
     else
         output << "          STATUS:    " << RED << "disconnected" << RESET << std::endl;
     output << "          FD:        " << cl.getFd() << std::endl;
-    output << "          IP:        " << cl.getIP() << std::endl;
-    if (!cl.getDataBuffer().empty())
+    output << "          IP:        " << cl.getIp() << std::endl;
+    if (!cl.getData().empty())
     {
-        std::istringstream ss(cl.getDataBuffer());
+        std::istringstream ss(cl.getData());
         std::string del;
         output << "          DATA:      ";
         getline(ss, del, '\n');

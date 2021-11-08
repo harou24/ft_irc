@@ -82,7 +82,7 @@ void    TcpConnection::acceptClientConnection(Client &cl)
         std::cout << "New connection ..." << std::endl;
 
         std::string ip(remoteIP);
-        cl.setIP(ip);
+        cl.setIp(ip);
         cl.setFd(newfd);
         cl.setConnected(true);
     }
@@ -134,12 +134,12 @@ int  TcpConnection::getFdMax() const
     return (this->fdMax);
 }
 
-void  TcpConnection::setFdMax(int newMax)
+void  TcpConnection::setFdMax(const int newMax)
 {
     this->fdMax = newMax;
 }
 
-bool    TcpConnection::isFdReadyForCommunication(int fd)
+bool    TcpConnection::isFdReadyForCommunication(const int fd)
 {
     return (isFdInSet(fd, &this->readFds));
 }
