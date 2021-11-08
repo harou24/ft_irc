@@ -1,5 +1,6 @@
 #include "server.hpp"
 #include "../tcp_connection/tcp_utils.hpp"
+#include "../tcp_connection/tcp_exceptions.hpp"
 
 #include <unistd.h>
 #include <arpa/inet.h>
@@ -24,7 +25,7 @@ void    Server::handleNewClient(void)
     {
         this->acceptClientConnection(cl);
     }
-    catch(std::exception &e)
+    catch(TcpAcceptException &e)
     {
         std::cerr << e.what() << std::endl;
     }

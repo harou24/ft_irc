@@ -3,8 +3,6 @@
 
 # include "../client/client.hpp"
 
-# include <stdexcept>
-
 class TcpConnection {
     private:
         const char  *port;
@@ -32,17 +30,6 @@ class TcpConnection {
 
         bool            isFdReadyForCommunication(const int fd);
 
-        class TcpAcceptException : public std::exception
-			{
-				public :
-						TcpAcceptException(void);
-						TcpAcceptException(const TcpAcceptException &cpy);
-						~TcpAcceptException(void) throw();
-
-						TcpAcceptException& operator = (const TcpAcceptException &old);
-
-						virtual const char* what() const throw();
-			};
 };
 
 #endif

@@ -13,6 +13,14 @@ void    *getInAddr(struct sockaddr *sa)
     return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
 
+int     getAddrInfo(const char *hostname,
+                        const char *servname,
+                            const struct addrinfo *hints,
+                                    struct addrinfo **res)
+{
+    return (getaddrinfo(hostname, servname, hints, res));
+}
+
 void    setSockAddrConfig(struct addrinfo *hints)
 {
     memset(hints, 0, sizeof(*hints));

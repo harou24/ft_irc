@@ -13,4 +13,8 @@ void    addFdToSet(int fd, fd_set *set);
 void    removeFdFromSet(int fd, fd_set *set);
 void    dieWithMsg(const char *msg);
 
+int     getAddrInfo(const char *hostname,
+                        const char *servname,
+                            const struct addrinfo *hints, 
+                                    struct addrinfo **res);
 #endif

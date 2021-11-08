@@ -1,5 +1,6 @@
 #include "tcp_connection.hpp"
 #include "tcp_utils.hpp"
+#include "tcp_exceptions.hpp"
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -35,11 +36,8 @@ void    TcpConnection::init(void)
     int             yes = 1;
 
     setSockAddrConfig(&hints);
-    if ((rv = getaddrinfo(NULL, this->port, &hints, &ai)) != 0)
-    {
-    	std::cout << "getaddrinfo() failed !\n" << gai_strerror(rv) << std::endl;
-        exit(EXIT_FAILURE);
-    }
+    if ((rv = getAddrInfo(NULL, this->port, &hints, &ai)) != 0)
+        throw TcpGetAddrInfoException(gai_strerror(rv));
     for(p = ai; p != NULL; p = p->ai_next)
     {
         this->listenerFd = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
@@ -73,7 +71,7 @@ void    TcpConnection::acceptClientConnection(Client &cl)
     newfd = accept(this->listenerFd, (struct sockaddr *)&remoteaddr, &addrlen);
 
     if (newfd == -1)
-        dieWithMsg("accept() error @_@\n");
+        throw TcpAcceptException();
     else
     {
         addFdToSet(newfd, &this->masterFds);
@@ -144,9 +142,3 @@ bool    TcpConnection::isFdReadyForCommunication(const int fd)
     return (isFdInSet(fd, &this->readFds));
 }
 
-TcpConnection::TcpAcceptException::TcpAcceptException(void){}
-TcpConnection::TcpAcceptException::TcpAcceptException(const TcpAcceptException &cpy){*this = cpy;}
-TcpConnection::TcpAcceptException::~TcpAcceptException(void) throw(){}
-
-TcpConnection::TcpAcceptException& TcpConnection::TcpAcceptException::operator = (const TcpAcceptException&){return (*this);}
-const char* TcpConnection::TcpAcceptException::what() const throw() {return ("Error : accept() function failed !");}
