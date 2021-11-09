@@ -15,7 +15,7 @@ Server::~Server(void) { }
 
 void    Server::sendGreetingMsg(const Client &cl) const
 {
-    write(cl.getFd(), WELCOME_MSG, sizeof(WELCOME_MSG));
+    this->sendData(cl.getFd(), WELCOME_MSG);
 }
 
 void    Server::handleNewClient(void)
@@ -23,7 +23,7 @@ void    Server::handleNewClient(void)
     Client cl;
     try 
     {
-        this->acceptClientConnection(cl);
+        this->acceptClientConnection(&cl);
     }
     catch(TcpAcceptException &e)
     {
@@ -79,6 +79,24 @@ void    Server::handleClientData(const int fd)
         cl.setData(data);
     }
     std::cout << cl;
+}
+
+std::string  Server::getClientIp(struct sockaddr_storage remoteAddr)
+{
+    char    remoteIp[INET6_ADDRSTRLEN];
+    inet_ntop(remoteAddr.ss_family, getInAddr((struct sockaddr*)&remoteAddr), remoteIp, INET6_ADDRSTRLEN);
+    std::string ip(remoteIp);
+    return (ip);
+}
+
+void    Server::acceptClientConnection(Client *cl)
+{
+    struct sockaddr_storage remoteAddr;
+    int fd = this->acceptConnection(&remoteAddr);
+    cl->setIp(this->getClientIp(remoteAddr));
+    cl->setFd(fd);
+    cl->setConnected(true);
+    std::cout << "New connection ...\n";
 }
 
 void    Server::start(void)

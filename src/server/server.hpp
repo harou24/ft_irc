@@ -27,8 +27,9 @@ class Server : public TcpConnection {
         void    sendGreetingMsg(const Client &cl) const;
 
         void    removeClient(const Client &cl);
-
+        void    acceptClientConnection(Client *cl);
         Client  getClient(const int fd);
+        std::string  getClientIp(struct sockaddr_storage remoteAddr);
 };
 
 

@@ -85,15 +85,13 @@ void    TcpConnection::init(void)
     this->setFdMax(this->listenerFd);
 }
 
-void    TcpConnection::acceptClientConnection(Client &cl)
+int    TcpConnection::acceptConnection(struct sockaddr_storage *remoteAddr)
 {
     socklen_t               addrlen;
     int                     newfd;
-    struct sockaddr_storage remoteaddr;
-    char                    remoteIP[INET6_ADDRSTRLEN];
 
-    addrlen = sizeof(remoteaddr);
-    newfd = accept(this->listenerFd, (struct sockaddr *)&remoteaddr, &addrlen);
+    addrlen = sizeof(remoteAddr);
+    newfd = accept(this->listenerFd, (struct sockaddr *)remoteAddr, &addrlen);
 
     if (newfd == -1)
         throw TcpAcceptException();
@@ -101,14 +99,8 @@ void    TcpConnection::acceptClientConnection(Client &cl)
     {
         addFdToSet(newfd, &this->masterFds);
         this->setFdMax(newfd);
-        inet_ntop(remoteaddr.ss_family, getInAddr((struct sockaddr*)&remoteaddr), remoteIP, INET6_ADDRSTRLEN);
-        std::cout << "New connection ..." << std::endl;
-
-        std::string ip(remoteIP);
-        cl.setIp(ip);
-        cl.setFd(newfd);
-        cl.setConnected(true);
     }
+    return (newfd);
 }
 
 std::string TcpConnection::getDataFromFd(int fd)
@@ -126,6 +118,12 @@ std::string TcpConnection::getDataFromFd(int fd)
     buf[nbytes] = '\0';
     std::string data(buf);
     return (data);
+}
+
+bool        TcpConnection::sendData(const int fd, const std::string &data) const
+{
+    const char *dataToSend = data.c_str();
+    return (write(fd, dataToSend, strlen(dataToSend)));
 }
 
 void    TcpConnection::updateFdsInSet(void)

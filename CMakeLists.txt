@@ -13,9 +13,18 @@ include(FetchContent)
 
 add_subdirectory(tests)
 
-add_executable(server.out app/main.cpp
+add_executable(server.out app/server.cpp
                 src/server/server.cpp
                 src/tcp_connection/tcp_utils.cpp
                 src/tcp_connection/tcp_exceptions.cpp
                 src/client/client.cpp
+                src/mock_client/mock_client.cpp
+                src/tcp_connection/tcp_connection.cpp)
+
+add_executable(client.out app/mock_client.cpp
+                src/server/server.cpp
+                src/tcp_connection/tcp_utils.cpp
+                src/tcp_connection/tcp_exceptions.cpp
+                src/client/client.cpp
+                src/mock_client/mock_client.cpp
                 src/tcp_connection/tcp_connection.cpp)

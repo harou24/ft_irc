@@ -4,9 +4,11 @@
 # include <sys/socket.h>
 # include <netinet/in.h>
 
-#include <iostream>
+# include <iostream>
 
-class Client {
+# include "../tcp_connection/tcp_connection.hpp"
+
+class Client : public TcpConnection {
 
    private:
         bool                    connected;
