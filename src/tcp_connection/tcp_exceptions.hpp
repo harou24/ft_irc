@@ -14,7 +14,7 @@ class TcpAcceptException: public std::exception {
         virtual const char* what() const throw();
 };
 
-class TcpAssignAddrToFd: public std::exception {
+class TcpAssignAddrToFdException: public std::exception {
     public:
         virtual const char* what() const throw();
 };

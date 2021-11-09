@@ -7,7 +7,7 @@
 #include <arpa/inet.h>
 
 #define MAX_PENDING_CONNECTION 10
-#define MAX_BUFF_SIZE
+#define MAX_BUFF_SIZE 256
 
 TcpConnection::TcpConnection(void)
 {
