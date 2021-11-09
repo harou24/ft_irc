@@ -22,11 +22,11 @@ class TcpConnection {
         int             assignAddrToListenerFd(int sockFd, const struct sockaddr *addr, socklen_t addrlen);
         std::string     getDataFromFd(int fd);
         void            updateFdsInSet(void);
+        int             findFd(e_fdType type, struct addrinfo *addresses);
 
         typedef         int (*t_ptrToFunction)(int, const struct sockaddr*, socklen_t);
         int             applyFunctionToAddresses(t_ptrToFunction function, struct addrinfo *addresses);
         
-        int             findFd(e_fdType type, struct addrinfo *addresses);
 
         fd_set          *getMasterFds(void);
         fd_set          *getReadFds(void);

@@ -7,6 +7,7 @@
 #include <arpa/inet.h>
 
 #define MAX_PENDING_CONNECTION 10
+#define MAX_BUFF_SIZE
 
 TcpConnection::TcpConnection(void)
 {
@@ -29,8 +30,8 @@ TcpConnection::~TcpConnection(void) { }
 
 int     TcpConnection::assignAddrToListenerFd(int sockFd, const struct sockaddr *addr, socklen_t addrlen)
 {
-    const bool  enable = true;
-    setsockopt(this->listenerFd, SOL_SOCKET, SO_REUSEADDR, (const void *)&enable, sizeof(int));
+    const bool  enableOpt = true;
+    setsockopt(this->listenerFd, SOL_SOCKET, SO_REUSEADDR, (const void *)&enableOpt, sizeof(int));
     return(assignAddrToFd(sockFd, addr, addrlen));
 }
 
@@ -63,7 +64,7 @@ int    TcpConnection::applyFunctionToAddresses(t_ptrToFunction function, struct 
         break;
     }
     if (tmpAddrInfo == NULL)
-        dieWithMsg("bind() error @_@\n");
+        throw TcpAssignAddrToFdException();
     return (fd);
 }
 
@@ -113,9 +114,9 @@ void    TcpConnection::acceptClientConnection(Client &cl)
 std::string TcpConnection::getDataFromFd(int fd)
 {
     int nbytes;
-    char buf[256];
+    char buf[MAX_BUFF_SIZE];
 
-    if ((nbytes = recv(fd, buf, sizeof buf, 0)) <= 0)
+    if ((nbytes = recv(fd, buf, sizeof(buf), 0)) <= 0)
     {
         if (nbytes == 0)
             std::cout << "TCP Connection lost !\n";

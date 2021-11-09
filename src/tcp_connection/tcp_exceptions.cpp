@@ -10,6 +10,11 @@ const char* TcpAcceptException::what() const throw()
     return ("Error : accept() function failed !");
 }
 
+const char* TcpAssignAddrToFdException::what() const throw()
+{
+    return ("Error Assigning addresse to fd : bind() function failed !");
+}
+
 TcpGetAddrInfoException::TcpGetAddrInfoException(const char *error)
 {
     this->errorInfo.assign(error);
