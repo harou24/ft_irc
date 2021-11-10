@@ -170,19 +170,19 @@ void    TcpConnection::updateFdsInSet(void)
 {
     this->readFds = this->masterFds;
     if (select(this->fdMax + 1, &this->readFds, NULL, NULL, NULL) == -1)
-        dieWithMsg("select() error @_@\n");
+        throw TcpException();
 }
 
 
-fd_set  *TcpConnection::getReadFds() { return (&this->readFds); }
+fd_set  *TcpConnection::getReadFds(void) { return (&this->readFds); }
 
-fd_set  *TcpConnection::getMasterFds() { return (&this->masterFds); }
+fd_set  *TcpConnection::getMasterFds(void) { return (&this->masterFds); }
 
-int  TcpConnection::getListenerFd() const { return (this->listenerFd); }
+int     TcpConnection::getListenerFd(void) const { return (this->listenerFd); }
 
-int  TcpConnection::getFdMax() const { return (this->fdMax); }
+int     TcpConnection::getFdMax(void) const { return (this->fdMax); }
 
-void  TcpConnection::setFdMax(const int newMax) { this->fdMax = newMax; }
+void    TcpConnection::setFdMax(const int newMax) { this->fdMax = newMax; }
 
 bool    TcpConnection::isFdReadyForCommunication(const int fd) { return (isFdInSet(fd, &this->readFds)); }
 
