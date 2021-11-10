@@ -21,10 +21,14 @@ class TcpConnection {
         ~TcpConnection(void);
 
         void            init(void);
+        
         int             acceptConnection(struct sockaddr_storage *remoteAddr);
+        bool            isFdReadyForCommunication(const int fd);
         int             assignAddrToListenerFd(int sockFd, const struct sockaddr *addr, socklen_t addrlen);
+
         std::string     getDataFromFd(int fd);
-        bool            sendData(const int fd, const std::string &data) const;
+        bool            sendDataToFd(const int fd, const std::string &data) const;
+        
         void            updateFdsInSet(void);
         int             findFd(e_fdType type, struct addrinfo *addresses);
 
@@ -38,7 +42,6 @@ class TcpConnection {
 
         void            setFdMax(const int newMax);
 
-        bool            isFdReadyForCommunication(const int fd);
 
 };
 

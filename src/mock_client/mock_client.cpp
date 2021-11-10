@@ -3,6 +3,8 @@
 #include <iostream>
 #include <unistd.h>
 
+#define CLIENT_MSG "-------------Hello World From Client-------------"
+
 MockClient::MockClient(void) : Client(){ }
 MockClient::~MockClient(void) { }
 
@@ -18,8 +20,9 @@ void    MockClient::connectToServer(const char *hostname, const char *port)
     }
     int servFd = this->findFd(TO_CONNECT, servInfo);
     freeaddrinfo(servInfo);
-    std::string data = getDataFromFd(servFd);
+    std::string data = receiveMsg(servFd);
     std::cout << "Data from server->" << data << std::endl;
-    this->sendData(servFd, "Hello World From Client");
+    std::string helloFromClient(CLIENT_MSG);
+    this->sendMsg(servFd, helloFromClient);
     close(servFd);
 }

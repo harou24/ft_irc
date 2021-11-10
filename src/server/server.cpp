@@ -1,6 +1,7 @@
 #include "server.hpp"
 #include "../tcp_connection/tcp_utils.hpp"
 #include "../tcp_connection/tcp_exceptions.hpp"
+#include "../client/ostream_client.hpp"
 
 #include <unistd.h>
 #include <arpa/inet.h>
@@ -15,7 +16,7 @@ Server::~Server(void) { }
 
 void    Server::sendGreetingMsg(const Client &cl) const
 {
-    this->sendData(cl.getFd(), WELCOME_MSG);
+    this->sendDataToFd(cl.getFd(), WELCOME_MSG);
 }
 
 void    Server::handleNewClient(void)

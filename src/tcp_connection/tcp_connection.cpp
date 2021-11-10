@@ -120,7 +120,7 @@ std::string TcpConnection::getDataFromFd(int fd)
     return (data);
 }
 
-bool        TcpConnection::sendData(const int fd, const std::string &data) const
+bool        TcpConnection::sendDataToFd(const int fd, const std::string &data) const
 {
     const char *dataToSend = data.c_str();
     return (write(fd, dataToSend, strlen(dataToSend)));

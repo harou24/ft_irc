@@ -11,8 +11,6 @@ class MockClient : public Client {
         ~MockClient(void);
 
         void        connectToServer(const char *hostname, const char *port);
-        void        sendMsgToServer(std::string &msg);
-        std::string reveiveMsgFromServer();
 
 };
 
