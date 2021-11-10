@@ -1,10 +1,14 @@
 #include "server.hpp"
-#include "server_utils.hpp"
+#include "../tcp_connection/tcp_utils.hpp"
+#include "../tcp_connection/tcp_exceptions.hpp"
+#include "../client/ostream_client.hpp"
 
 #include <unistd.h>
 #include <arpa/inet.h>
 
+
 #define WELCOME_MSG "------- Welcome to the server ! -------\n"
+
 
 Server::Server(void): TcpConnection("8080") { }
 
@@ -14,7 +18,7 @@ Server::~Server(void) { }
 
 void    Server::sendGreetingMsg(const Client &cl) const
 {
-    write(cl.getFd(), WELCOME_MSG, sizeof(WELCOME_MSG));
+    this->sendDataToFd(cl.getFd(), WELCOME_MSG);
 }
 
 void    Server::handleNewClient(void)
@@ -22,9 +26,9 @@ void    Server::handleNewClient(void)
     Client cl;
     try 
     {
-        this->acceptClientConnection(cl);
+        this->acceptClientConnection(&cl);
     }
-    catch(std::exception &e)
+    catch(TcpAcceptException &e)
     {
         std::cerr << e.what() << std::endl;
     }
@@ -80,9 +84,27 @@ void    Server::handleClientData(const int fd)
     std::cout << cl;
 }
 
+std::string  Server::getClientIp(struct sockaddr_storage remoteAddr)
+{
+    char    remoteIp[INET6_ADDRSTRLEN];
+    inet_ntop(remoteAddr.ss_family, getInAddr((struct sockaddr*)&remoteAddr), remoteIp, INET6_ADDRSTRLEN);
+    std::string ip(remoteIp);
+    return (ip);
+}
+
+void    Server::acceptClientConnection(Client *cl)
+{
+    struct sockaddr_storage remoteAddr;
+    int fd = this->acceptConnection(&remoteAddr);
+    cl->setIp(this->getClientIp(remoteAddr));
+    cl->setFd(fd);
+    cl->setConnected(true);
+    std::cout << "New connection ...\n";
+}
+
 void    Server::start(void)
 {
-    this->init();
+    this->init(TO_LISTEN);
     while (true)
     {
         try

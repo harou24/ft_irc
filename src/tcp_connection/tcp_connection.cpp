@@ -1,11 +1,14 @@
 #include "tcp_connection.hpp"
-#include "../server/server_utils.hpp"
+#include "tcp_utils.hpp"
+#include "tcp_exceptions.hpp"
 
 #include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
 #include <arpa/inet.h>
 
 #define MAX_PENDING_CONNECTION 10
+#define MAX_BUFF_SIZE 256
 
 TcpConnection::TcpConnection(void)
 {
@@ -13,6 +16,7 @@ TcpConnection::TcpConnection(void)
     zeroFdSet(&this->masterFds);
     zeroFdSet(&this->readFds);
     this->listenerFd = -1;
+    this->connectingFd = -1;
     this->fdMax = 0;
 }
 
@@ -21,90 +25,145 @@ TcpConnection::TcpConnection(const char *port) : port(port)
     zeroFdSet(&this->masterFds);
     zeroFdSet(&this->readFds);
     this->listenerFd = -1;
+    this->connectingFd = -1;
+    this->fdMax = 0;
+}
+
+TcpConnection::TcpConnection(const char *hostname, const char *port)
+{
+    this->hostname = hostname;
+    this->port = port;
+    this->port = "8080";
+    zeroFdSet(&this->masterFds);
+    zeroFdSet(&this->readFds);
+    this->listenerFd = -1;
+    this->connectingFd = -1;
     this->fdMax = 0;
 }
 
 TcpConnection::~TcpConnection(void) { }
 
-void    TcpConnection::init(void)
+int     TcpConnection::assignAddrToListenerFd(int sockFd, const struct sockaddr *addr, socklen_t addrlen)
 {
-    struct addrinfo hints;
-    struct addrinfo *ai;
-    struct addrinfo *p;
-    int             rv;
-    int             yes = 1;
+    const bool  enableOpt = true;
+    setsockopt(this->listenerFd, SOL_SOCKET, SO_REUSEADDR, (const void *)&enableOpt, sizeof(int));
+    return(assignAddrToFd(sockFd, addr, addrlen));
+}
 
-    setSockAddrConfig(&hints);
-    if ((rv = getaddrinfo(NULL, this->port, &hints, &ai)) != 0)
+int     TcpConnection::findFd(e_fdType type, struct addrinfo *addresses)
+{
+    t_ptrToFunction function = NULL;
+    int             fd;
+    
+    if (type == TO_LISTEN)
+        function = &assignAddrToFd;
+    else if(type == TO_CONNECT)
+        function = &connectFdToAddr;
+    try
     {
-    	std::cout << "getaddrinfo() failed !\n" << gai_strerror(rv) << std::endl;
-        exit(EXIT_FAILURE);
+        fd = this->applyFunctionToAddresses(function, addresses);
     }
-    for(p = ai; p != NULL; p = p->ai_next)
+    catch (TcpException &e)
     {
-        this->listenerFd = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
-        if (this->listenerFd < 0)
+        std::cerr << e.what();
+    }
+    return(fd);
+}
+
+int    TcpConnection::applyFunctionToAddresses(t_ptrToFunction function, struct addrinfo *addresses)
+{
+    struct addrinfo     *tmpAddrInfo;
+    int                 fd;
+
+    for(tmpAddrInfo = addresses; tmpAddrInfo != NULL; tmpAddrInfo = tmpAddrInfo->ai_next)
+    {
+        fd = socket(tmpAddrInfo->ai_family, tmpAddrInfo->ai_socktype, tmpAddrInfo->ai_protocol);
+        if (fd < 0)
             continue;
-        setsockopt(this->listenerFd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
-        if (bind(this->listenerFd, p->ai_addr, p->ai_addrlen) < 0)
+        if (function(fd, tmpAddrInfo->ai_addr, tmpAddrInfo->ai_addrlen) < 0)
         {
-            close(this->listenerFd);
+            close(fd);
             continue;
         }
         break;
     }
-    freeaddrinfo(ai);
-    if (p == NULL)
-        dieWithMsg("bind() error @_@\n");
-    if (listen(this->listenerFd, MAX_PENDING_CONNECTION) == -1)
-        dieWithMsg("listen() error @_@\n");
-    addFdToSet(this->listenerFd, &this->masterFds);
-    this->setFdMax(this->listenerFd);
+    if (tmpAddrInfo == NULL)
+        throw TcpAssignAddrToFdException();
+    return (fd);
 }
 
-void    TcpConnection::acceptClientConnection(Client &cl)
+int            TcpConnection::getFd(e_fdType type, const char *hostname, const char *port)
+{
+    struct addrinfo *addrInfo;
+
+    try
+    {
+        addrInfo = getAddrInfo(hostname, port);
+    }
+    catch(TcpGetAddrInfoException &e)
+    {
+        std::cerr << e.what();
+    }
+    int  fd = this->findFd(type, addrInfo);
+    freeAddrInfo(addrInfo);
+    return (fd);
+}
+
+void    TcpConnection::init(e_fdType type)
+{
+    if (type == TO_LISTEN)
+    {
+        this->listenerFd = this->getFd(TO_LISTEN, NULL, this->port);
+        if (listen(this->listenerFd, MAX_PENDING_CONNECTION) == -1)
+            dieWithMsg("listen() error @_@\n");
+        addFdToSet(this->listenerFd, &this->masterFds);
+        this->setFdMax(this->listenerFd);
+    }
+    else if (type == TO_CONNECT)
+    {
+        this->connectingFd = this->getFd(TO_CONNECT, this->hostname, this->port);
+    }
+}
+
+int    TcpConnection::acceptConnection(struct sockaddr_storage *remoteAddr)
 {
     socklen_t               addrlen;
     int                     newfd;
-    struct sockaddr_storage remoteaddr;
-    char                    remoteIP[INET6_ADDRSTRLEN];
 
-    addrlen = sizeof(remoteaddr);
-    newfd = accept(this->listenerFd, (struct sockaddr *)&remoteaddr, &addrlen);
+    addrlen = sizeof(remoteAddr);
+    newfd = accept(this->listenerFd, (struct sockaddr *)remoteAddr, &addrlen);
 
     if (newfd == -1)
-        dieWithMsg("accept() error @_@\n");
+        throw TcpAcceptException();
     else
     {
         addFdToSet(newfd, &this->masterFds);
         this->setFdMax(newfd);
-        inet_ntop(remoteaddr.ss_family, getInAddr((struct sockaddr*)&remoteaddr), remoteIP, INET6_ADDRSTRLEN);
-        std::cout << "New connection ..." << std::endl;
-
-        std::string ip(remoteIP);
-        cl.setIp(ip);
-        cl.setFd(newfd);
-        cl.setConnected(true);
     }
+    return (newfd);
 }
 
 std::string TcpConnection::getDataFromFd(int fd)
 {
     int nbytes;
-    char buf[256];
+    char buf[MAX_BUFF_SIZE];
 
-    if ((nbytes = recv(fd, buf, sizeof buf, 0)) <= 0)
+    if ((nbytes = recv(fd, buf, sizeof(buf), 0)) <= 0)
     {
         if (nbytes == 0)
-        {
             std::cout << "TCP Connection lost !\n";
-        }
         else
             std::cerr << "recv() error @_@\n";
     }
     buf[nbytes] = '\0';
     std::string data(buf);
     return (data);
+}
+
+bool        TcpConnection::sendDataToFd(const int fd, const std::string &data) const
+{
+    const char *dataToSend = data.c_str();
+    return (write(fd, dataToSend, strlen(dataToSend)));
 }
 
 void    TcpConnection::updateFdsInSet(void)
@@ -114,39 +173,17 @@ void    TcpConnection::updateFdsInSet(void)
         dieWithMsg("select() error @_@\n");
 }
 
-fd_set  *TcpConnection::getReadFds()
-{
-    return (&this->readFds);
-}
 
-fd_set  *TcpConnection::getMasterFds()
-{
-    return (&this->masterFds);
-}
+fd_set  *TcpConnection::getReadFds() { return (&this->readFds); }
 
-int  TcpConnection::getListenerFd() const
-{
-    return (this->listenerFd);
-}
+fd_set  *TcpConnection::getMasterFds() { return (&this->masterFds); }
 
-int  TcpConnection::getFdMax() const
-{
-    return (this->fdMax);
-}
+int  TcpConnection::getListenerFd() const { return (this->listenerFd); }
 
-void  TcpConnection::setFdMax(const int newMax)
-{
-    this->fdMax = newMax;
-}
+int  TcpConnection::getFdMax() const { return (this->fdMax); }
 
-bool    TcpConnection::isFdReadyForCommunication(const int fd)
-{
-    return (isFdInSet(fd, &this->readFds));
-}
+void  TcpConnection::setFdMax(const int newMax) { this->fdMax = newMax; }
 
-TcpConnection::TcpAcceptException::TcpAcceptException(void){}
-TcpConnection::TcpAcceptException::TcpAcceptException(const TcpAcceptException &cpy){*this = cpy;}
-TcpConnection::TcpAcceptException::~TcpAcceptException(void) throw(){}
+bool    TcpConnection::isFdReadyForCommunication(const int fd) { return (isFdInSet(fd, &this->readFds)); }
 
-TcpConnection::TcpAcceptException& TcpConnection::TcpAcceptException::operator = (const TcpAcceptException&){return (*this);}
-const char* TcpConnection::TcpAcceptException::what() const throw() {return ("Error : accept() function failed !");}
+int     TcpConnection::getConnectingFd(void) const { return (this->connectingFd); }

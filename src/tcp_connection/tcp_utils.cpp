@@ -1,4 +1,5 @@
-#include "server_utils.hpp"
+#include "tcp_utils.hpp"
+#include "tcp_exceptions.hpp"
 
 #include <string.h>
 #include <stdlib.h>
@@ -11,6 +12,23 @@ void    *getInAddr(struct sockaddr *sa)
         return &(((struct sockaddr_in*)sa)->sin_addr);
     }
     return &(((struct sockaddr_in6*)sa)->sin6_addr);
+}
+
+struct addrinfo     *getAddrInfo(const char *hostname, const char *servname)
+{
+    struct addrinfo hints;
+    struct addrinfo *addrinfo;
+    int             ret;
+
+    setSockAddrConfig(&hints);
+    if ((ret = getaddrinfo(hostname, servname, &hints, &addrinfo)) != 0)
+            throw TcpGetAddrInfoException(gai_strerror(ret));
+    return (addrinfo);
+}
+
+void                freeAddrInfo(struct addrinfo *addrinfo)
+{
+    freeaddrinfo(addrinfo);
 }
 
 void    setSockAddrConfig(struct addrinfo *hints)
@@ -45,4 +63,14 @@ void    dieWithMsg(const char *msg)
 {
     std::cout << msg << std::endl;
     exit(EXIT_FAILURE);
+}
+
+int     assignAddrToFd(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
+{
+    return(bind(sockfd, addr, addrlen));
+}
+
+int     connectFdToAddr(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
+{
+    return (connect(sockfd, addr, addrlen));
 }

@@ -4,9 +4,12 @@
 # include <sys/socket.h>
 # include <netinet/in.h>
 
-#include <iostream>
+# include <iostream>
 
-class Client {
+
+# include "../tcp_connection/tcp_connection.hpp"
+
+class Client : public TcpConnection {
 
    private:
         bool                    connected;
@@ -17,7 +20,13 @@ class Client {
     public:
         Client(void);
         Client(const int fd, const std::string &ip);
+        Client(const char *hostname, const char *port);
         ~Client(void);
+        
+        void                    sendMsg(const int fd, std::string &msg);
+        std::string             receiveMsg(const int fd);
+
+        int                     getServerFd(const char *hostname, const char *port);
         
         int                     getFd(void) const;
         std::string             getData(void) const;
@@ -28,8 +37,7 @@ class Client {
         void                    setFd(const int newFd);
         void                    setData(const std::string &data);
         void                    setConnected(const bool status);
-};
 
-std::ostream &operator << (std::ostream &output, const Client &cl);
+};
 
 #endif

@@ -1,85 +1,41 @@
 #include "client.hpp"
-#include "../utils/colors.h"
+#include "../tcp_connection/tcp_utils.hpp"
+#include "../tcp_connection/tcp_exceptions.hpp"
 
 #include <string.h>
 
-#include<sstream>
+Client::Client(void) : connected(false), fd(-1)  { }
 
-Client::Client(void)
-{
-    this->fd = -1;
-    this->connected = false;
-}
+Client::Client(const char *hostname, const char *port) : TcpConnection(hostname, port) { }
 
-Client::Client(const int fd, const std::string &ip)
-{
-    this->fd = fd;
-    this->ip = ip;
-    this->connected = false;
-}
+Client::Client(const int fd, const std::string &ip) : connected(false), fd(fd), ip(ip) { }
 
 Client::~Client(void){ }
 
-int     Client::getFd(void) const
+
+void            Client::sendMsg(const int fd, std::string &msg) { this->sendDataToFd(fd, msg); }
+
+std::string     Client::receiveMsg(const int fd) { return (this->getDataFromFd(fd)); }
+
+int            Client::getServerFd(const char *hostname, const char *port)
 {
-    return (this->fd);
+    return (this->TcpConnection::getFd(TO_CONNECT, hostname, port));
 }
 
-std::string    Client::getIp(void) const
-{
-    return (this->ip);
-}
+int             Client::getFd(void) const { return (this->fd); }
 
-std::string    Client::getData(void) const
-{
-    return (this->data);
-}
+std::string     Client::getIp(void) const { return (this->ip); }
 
-void            Client::setData(const std::string &data)
-{
-    this->data.assign(data);
-}
+std::string     Client::getData(void) const { return (this->data); }
 
-bool            Client::isConnected(void) const
-{
-    return (this->connected);
-}
+bool            Client::isConnected(void) const { return (this->connected); }
 
-void            Client::setConnected(const bool status)
-{
-    this->connected = status;
-}
 
-void            Client::setIp(const std::string &newIp)
-{
-    this->ip = newIp;
-}
+void            Client::setData(const std::string &data) { this->data.assign(data); }
 
-void            Client::setFd(const int newFd)
-{
-    this->fd = newFd;
-}
+void            Client::setConnected(const bool status) { this->connected = status; }
 
-std::ostream &operator << (std::ostream &output , const Client &cl)
-{
-	output << "Client {\n";
-    if (cl.isConnected())
-        output << "          STATUS:    " << GREEN << "connected" << RESET << std::endl;
-    else
-        output << "          STATUS:    " << RED << "disconnected" << RESET << std::endl;
-    output << "          FD:        " << cl.getFd() << std::endl;
-    output << "          IP:        " << cl.getIp() << std::endl;
-    if (!cl.getData().empty())
-    {
-        std::istringstream ss(cl.getData());
-        std::string del;
-        output << "          DATA:      ";
-        getline(ss, del, '\n');
-        output << del << '\n';
-        while(getline(ss, del, '\n'))
-            output << "                     " << del << '\n';
-    
-    }    
-    output << "}" << std::endl << std::endl;
-	return (output);
-}
+void            Client::setIp(const std::string &newIp) { this->ip = newIp; }
+
+void            Client::setFd(const int newFd) { this->fd = newFd; }
+
