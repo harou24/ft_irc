@@ -4,6 +4,7 @@
 
 #include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
 #include <arpa/inet.h>
 
 #define MAX_PENDING_CONNECTION 10
