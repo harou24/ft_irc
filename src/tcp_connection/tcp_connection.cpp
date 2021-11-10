@@ -15,6 +15,7 @@ TcpConnection::TcpConnection(void)
     zeroFdSet(&this->masterFds);
     zeroFdSet(&this->readFds);
     this->listenerFd = -1;
+    this->connectingFd = -1;
     this->fdMax = 0;
 }
 
@@ -23,6 +24,7 @@ TcpConnection::TcpConnection(const char *port) : port(port)
     zeroFdSet(&this->masterFds);
     zeroFdSet(&this->readFds);
     this->listenerFd = -1;
+    this->connectingFd = -1;
     this->fdMax = 0;
 }
 
@@ -68,17 +70,26 @@ int    TcpConnection::applyFunctionToAddresses(t_ptrToFunction function, struct 
     return (fd);
 }
 
+int            TcpConnection::getFd(e_fdType type, const char *hostname, const char *port)
+{
+    struct addrinfo *servInfo;
+
+    try
+    {
+        servInfo = getAddrInfo(hostname, port);
+    }
+    catch(TcpGetAddrInfoException &e)
+    {
+        std::cerr << e.what();
+    }
+    int  servFd = this->findFd(type, servInfo);
+    freeAddrInfo(servInfo);
+    return (servFd);
+}
+
 void    TcpConnection::init(void)
 {
-    struct addrinfo     hints;
-    struct addrinfo     *addrInfo;
-    int                 ret;
-
-    setSockAddrConfig(&hints);
-    if ((ret = getAddrInfo(NULL, this->port, &hints, &addrInfo)) != 0)
-        throw TcpGetAddrInfoException(gai_strerror(ret));
-    this->listenerFd = this->findFd(TO_LISTEN, addrInfo);
-    freeaddrinfo(addrInfo);
+    this->listenerFd = this->getFd(TO_LISTEN, NULL, this->port);
     if (listen(this->listenerFd, MAX_PENDING_CONNECTION) == -1)
         dieWithMsg("listen() error @_@\n");
     addFdToSet(this->listenerFd, &this->masterFds);
@@ -133,33 +144,16 @@ void    TcpConnection::updateFdsInSet(void)
         dieWithMsg("select() error @_@\n");
 }
 
-fd_set  *TcpConnection::getReadFds()
-{
-    return (&this->readFds);
-}
 
-fd_set  *TcpConnection::getMasterFds()
-{
-    return (&this->masterFds);
-}
+fd_set  *TcpConnection::getReadFds() { return (&this->readFds); }
 
-int  TcpConnection::getListenerFd() const
-{
-    return (this->listenerFd);
-}
+fd_set  *TcpConnection::getMasterFds() { return (&this->masterFds); }
 
-int  TcpConnection::getFdMax() const
-{
-    return (this->fdMax);
-}
+int  TcpConnection::getListenerFd() const { return (this->listenerFd); }
 
-void  TcpConnection::setFdMax(const int newMax)
-{
-    this->fdMax = newMax;
-}
+int  TcpConnection::getFdMax() const { return (this->fdMax); }
 
-bool    TcpConnection::isFdReadyForCommunication(const int fd)
-{
-    return (isFdInSet(fd, &this->readFds));
-}
+void  TcpConnection::setFdMax(const int newMax) { this->fdMax = newMax; }
+
+bool    TcpConnection::isFdReadyForCommunication(const int fd) { return (isFdInSet(fd, &this->readFds)); }
 

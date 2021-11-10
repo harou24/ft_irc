@@ -13,10 +13,8 @@ void    addFdToSet(int fd, fd_set *set);
 void    removeFdFromSet(int fd, fd_set *set);
 void    dieWithMsg(const char *msg);
 
-int     getAddrInfo(const char *hostname,
-                        const char *servname,
-                            const struct addrinfo *hints, 
-                                    struct addrinfo **res);
+struct addrinfo     *getAddrInfo(const char *hostname, const char *servname);
+void                freeAddrInfo(struct addrinfo *addrinfo);
 
 int     assignAddrToFd(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
 int     connectFdToAddr(int sockfd, const struct sockaddr *addr, socklen_t addrlen);

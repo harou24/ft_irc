@@ -25,7 +25,7 @@ class Client : public TcpConnection {
         void                    sendMsg(const int fd, std::string &msg);
         std::string             receiveMsg(const int fd);
 
-        void                    connectToServer(const char *hostname, const char *port);
+        int                     getServerFd(const char *hostname, const char *port);
         
         int                     getFd(void) const;
         std::string             getData(void) const;

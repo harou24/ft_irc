@@ -1,4 +1,7 @@
 #include "client.hpp"
+#include "../tcp_connection/tcp_utils.hpp"
+#include "../tcp_connection/tcp_exceptions.hpp"
+
 #include <string.h>
 
 Client::Client(void) : connected(false), fd(-1)  { }
@@ -12,6 +15,10 @@ void            Client::sendMsg(const int fd, std::string &msg) { this->sendData
 
 std::string     Client::receiveMsg(const int fd) { return (this->getDataFromFd(fd)); }
 
+int            Client::getServerFd(const char *hostname, const char *port)
+{
+    return (this->TcpConnection::getFd(TO_CONNECT, hostname, port));
+}
 
 int             Client::getFd(void) const { return (this->fd); }
 

@@ -11,6 +11,7 @@ class TcpConnection {
         fd_set      masterFds;
         fd_set      readFds;
         int         listenerFd;
+        int         connectingFd;
         int         fdMax;
 
     public:
@@ -39,6 +40,7 @@ class TcpConnection {
         fd_set          *getReadFds(void);
         int             getListenerFd(void) const;
         int             getFdMax(void) const;
+        int             getFd(e_fdType type, const char *hostname, const char *port);
 
         void            setFdMax(const int newMax);
 

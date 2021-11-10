@@ -10,16 +10,7 @@ MockClient::~MockClient(void) { }
 
 void    MockClient::connectToServer(const char *hostname, const char *port)
 {
-    struct addrinfo hints;
-    struct addrinfo *servInfo;
-
-    setSockAddrConfig(&hints);
-    if (getAddrInfo(hostname, port, &hints, &servInfo) != 0)
-    {
-        dieWithMsg("Error : getAddrInfo...\n");
-    }
-    int servFd = this->findFd(TO_CONNECT, servInfo);
-    freeaddrinfo(servInfo);
+    int servFd = this->getServerFd(hostname, port);
     std::string data = receiveMsg(servFd);
     std::cout << "Data from server->" << data << std::endl;
     std::string helloFromClient(CLIENT_MSG);
