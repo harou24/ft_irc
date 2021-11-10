@@ -12,9 +12,9 @@ MockClient::~MockClient(void) { }
 void    MockClient::connectToServer(void)
 {
     this->init(TO_CONNECT);
-    std::string data = receiveMsg(this->getConnectingFd());
+    std::string data = receiveMsg(this->getServerFd());
     std::cout << "Data from server->" << data << std::endl;
     std::string helloFromClient(CLIENT_MSG);
-    this->sendMsg(this->getConnectingFd(), helloFromClient);
-    close(this->getConnectingFd());
+    this->sendMsg(this->getServerFd(), helloFromClient);
+    close(this->getServerFd());
 }
