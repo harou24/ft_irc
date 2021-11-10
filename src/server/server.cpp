@@ -102,29 +102,34 @@ void    Server::acceptClientConnection(Client *cl)
     std::cout << "New connection ...\n";
 }
 
+void    Server::runOnce(void)
+{
+    try
+    {
+        this->updateFdsInSet();
+    }
+    catch (std::exception &e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
+    for(int fd = 0; fd <= this->getFdMax(); fd++)
+    {
+
+        if (isFdReadyForCommunication(fd))
+        {
+            if (fd == this->getListenerFd())
+                this->handleNewClient();
+            else
+                this->handleClientData(fd);
+        }
+    }
+}
+
 void    Server::start(void)
 {
-    this->init(TO_LISTEN);
+    this->TcpConnection::init(TO_LISTEN);
     while (true)
     {
-        try
-        {
-            this->updateFdsInSet();
-        }
-        catch (std::exception &e)
-        {
-            std::cerr << e.what() << std::endl;
-        }
-        for(int fd = 0; fd <= this->getFdMax(); fd++)
-        {
-
-            if (isFdReadyForCommunication(fd))
-            {
-                if (fd == this->getListenerFd())
-                    this->handleNewClient();
-                else
-                    this->handleClientData(fd);
-            }
-        }
+        this->runOnce();
     }
 }

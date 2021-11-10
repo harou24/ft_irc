@@ -18,7 +18,8 @@ class Server : public TcpConnection {
         Server(void);
         Server(const char *port);
         ~Server(void);
-        
+       
+        void    runOnce(void);
         void    start(void);
 
         void    handleNewClient(void);
@@ -30,6 +31,7 @@ class Server : public TcpConnection {
         void    acceptClientConnection(Client *cl);
         Client  getClient(const int fd);
         std::string  getClientIp(struct sockaddr_storage remoteAddr);
+
 };
 
 
