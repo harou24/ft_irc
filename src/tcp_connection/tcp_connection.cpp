@@ -52,12 +52,21 @@ int     TcpConnection::assignAddrToListenerFd(int sockFd, const struct sockaddr 
 int     TcpConnection::findFd(e_fdType type, struct addrinfo *addresses)
 {
     t_ptrToFunction function = NULL;
+    int             fd;
     
     if (type == TO_LISTEN)
         function = &assignAddrToFd;
     else if(type == TO_CONNECT)
         function = &connectFdToAddr;
-    return(this->applyFunctionToAddresses(function, addresses));
+    try
+    {
+        fd = this->applyFunctionToAddresses(function, addresses);
+    }
+    catch (TcpException &e)
+    {
+        std::cerr << e.what();
+    }
+    return(fd);
 }
 
 int    TcpConnection::applyFunctionToAddresses(t_ptrToFunction function, struct addrinfo *addresses)
@@ -84,19 +93,19 @@ int    TcpConnection::applyFunctionToAddresses(t_ptrToFunction function, struct 
 
 int            TcpConnection::getFd(e_fdType type, const char *hostname, const char *port)
 {
-    struct addrinfo *servInfo;
+    struct addrinfo *addrInfo;
 
     try
     {
-        servInfo = getAddrInfo(hostname, port);
+        addrInfo = getAddrInfo(hostname, port);
     }
     catch(TcpGetAddrInfoException &e)
     {
         std::cerr << e.what();
     }
-    int  servFd = this->findFd(type, servInfo);
-    freeAddrInfo(servInfo);
-    return (servFd);
+    int  fd = this->findFd(type, addrInfo);
+    freeAddrInfo(addrInfo);
+    return (fd);
 }
 
 void    TcpConnection::init(e_fdType type)
