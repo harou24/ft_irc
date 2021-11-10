@@ -22,6 +22,8 @@ int            Client::getServerFd(const char *hostname, const char *port)
     return (this->TcpConnection::getFd(TO_CONNECT, hostname, port));
 }
 
+int             Client::getServerFd(void) const { return (this->getConnectingFd()); }
+
 int             Client::getFd(void) const { return (this->fd); }
 
 std::string     Client::getIp(void) const { return (this->ip); }

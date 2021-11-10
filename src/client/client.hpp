@@ -28,6 +28,7 @@ class Client : public TcpConnection {
 
         int                     getServerFd(const char *hostname, const char *port);
         
+        int                     getServerFd(void) const;
         int                     getFd(void) const;
         std::string             getData(void) const;
         std::string             getIp(void) const;
