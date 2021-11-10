@@ -104,7 +104,7 @@ void    Server::acceptClientConnection(Client *cl)
 
 void    Server::start(void)
 {
-    this->init();
+    this->init(TO_LISTEN);
     while (true)
     {
         try

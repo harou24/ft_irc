@@ -8,9 +8,10 @@ class MockClient : public Client {
 
     public:
         MockClient(void);
+        MockClient(const char *hostname, const char *port);
         ~MockClient(void);
 
-        void        connectToServer(const char *hostname, const char *port);
+        void        connectToServer(void);
 
 };
 

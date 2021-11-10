@@ -7,6 +7,7 @@
 
 class TcpConnection {
     private:
+        const char  *hostname;
         const char  *port;
         fd_set      masterFds;
         fd_set      readFds;
@@ -19,9 +20,10 @@ class TcpConnection {
         
         TcpConnection(void);
         TcpConnection(const char *port);
+        TcpConnection(const char *hostname, const char *port);
         ~TcpConnection(void);
 
-        void            init(void);
+        void            init(e_fdType type);
         
         int             acceptConnection(struct sockaddr_storage *remoteAddr);
         bool            isFdReadyForCommunication(const int fd);
@@ -41,6 +43,7 @@ class TcpConnection {
         int             getListenerFd(void) const;
         int             getFdMax(void) const;
         int             getFd(e_fdType type, const char *hostname, const char *port);
+        int             getConnectingFd(void) const;
 
         void            setFdMax(const int newMax);
 

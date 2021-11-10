@@ -28,6 +28,18 @@ TcpConnection::TcpConnection(const char *port) : port(port)
     this->fdMax = 0;
 }
 
+TcpConnection::TcpConnection(const char *hostname, const char *port)
+{
+    this->hostname = hostname;
+    this->port = port;
+    this->port = "8080";
+    zeroFdSet(&this->masterFds);
+    zeroFdSet(&this->readFds);
+    this->listenerFd = -1;
+    this->connectingFd = -1;
+    this->fdMax = 0;
+}
+
 TcpConnection::~TcpConnection(void) { }
 
 int     TcpConnection::assignAddrToListenerFd(int sockFd, const struct sockaddr *addr, socklen_t addrlen)
@@ -87,13 +99,20 @@ int            TcpConnection::getFd(e_fdType type, const char *hostname, const c
     return (servFd);
 }
 
-void    TcpConnection::init(void)
+void    TcpConnection::init(e_fdType type)
 {
-    this->listenerFd = this->getFd(TO_LISTEN, NULL, this->port);
-    if (listen(this->listenerFd, MAX_PENDING_CONNECTION) == -1)
-        dieWithMsg("listen() error @_@\n");
-    addFdToSet(this->listenerFd, &this->masterFds);
-    this->setFdMax(this->listenerFd);
+    if (type == TO_LISTEN)
+    {
+        this->listenerFd = this->getFd(TO_LISTEN, NULL, this->port);
+        if (listen(this->listenerFd, MAX_PENDING_CONNECTION) == -1)
+            dieWithMsg("listen() error @_@\n");
+        addFdToSet(this->listenerFd, &this->masterFds);
+        this->setFdMax(this->listenerFd);
+    }
+    else if (type == TO_CONNECT)
+    {
+        this->connectingFd = this->getFd(TO_CONNECT, this->hostname, this->port);
+    }
 }
 
 int    TcpConnection::acceptConnection(struct sockaddr_storage *remoteAddr)
@@ -157,3 +176,4 @@ void  TcpConnection::setFdMax(const int newMax) { this->fdMax = newMax; }
 
 bool    TcpConnection::isFdReadyForCommunication(const int fd) { return (isFdInSet(fd, &this->readFds)); }
 
+int     TcpConnection::getConnectingFd(void) const { return (this->connectingFd); }

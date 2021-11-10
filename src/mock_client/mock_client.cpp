@@ -6,14 +6,15 @@
 #define CLIENT_MSG "-------------Hello World From Client-------------"
 
 MockClient::MockClient(void) : Client(){ }
+MockClient::MockClient(const char *hostname, const char *port) : Client(hostname, port) { }
 MockClient::~MockClient(void) { }
 
-void    MockClient::connectToServer(const char *hostname, const char *port)
+void    MockClient::connectToServer(void)
 {
-    int servFd = this->getServerFd(hostname, port);
-    std::string data = receiveMsg(servFd);
+    this->init(TO_CONNECT);
+    std::string data = receiveMsg(this->getConnectingFd());
     std::cout << "Data from server->" << data << std::endl;
     std::string helloFromClient(CLIENT_MSG);
-    this->sendMsg(servFd, helloFromClient);
-    close(servFd);
+    this->sendMsg(this->getConnectingFd(), helloFromClient);
+    close(this->getConnectingFd());
 }

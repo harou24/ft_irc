@@ -20,6 +20,7 @@ class Client : public TcpConnection {
     public:
         Client(void);
         Client(const int fd, const std::string &ip);
+        Client(const char *hostname, const char *port);
         ~Client(void);
         
         void                    sendMsg(const int fd, std::string &msg);

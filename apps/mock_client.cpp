@@ -4,7 +4,7 @@ int     main(int argc, char **argv)
 {
     if (argc != 3)
         return (EXIT_FAILURE);
-    MockClient cl;
-    cl.connectToServer(argv[1], argv[2]);
+    MockClient cl(argv[1], argv[2]);
+    cl.connectToServer();
     return (EXIT_SUCCESS);
 }
