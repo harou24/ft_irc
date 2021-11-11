@@ -19,3 +19,4 @@ bash make.sh clean
 # CI
 [![macOS](https://github.com/harou24/ft_irc/actions/workflows/macos.yml/badge.svg)](https://github.com/harou24/ft_irc/actions/workflows/macos.yml)
 [![ubuntu](https://github.com/harou24/ft_irc/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/harou24/ft_irc/actions/workflows/ubuntu.yml)
+
