@@ -15,14 +15,13 @@ TEST_CASE("Send Data", "[CLIENT]")
 {
     Client cl;
     std::cout << cl;
-//    int fdToSendTo = 4;
-//    std::string dataToSend("HelloWorld\n");
-//    cl.sendMsg(fdToSendTo, dataToSend);
+    int fdToSendTo = 4;
+    std::string dataToSend("HelloWorld\n");
+    cl.sendMsg(fdToSendTo, dataToSend);
 
-//    char    buff[TEST_BUFF_SIZE];
-//    memset(buff, 0, TEST_BUFF_SIZE);
-//    int nbBytes = read(fdToSendTo, buff, TEST_BUFF_SIZE);
-//    buff[nbBytes] = '\0';
-    //std::string dataRead(buff);
-   // REQUIRE(dataToSend == dataRead);
+    char    buff[TEST_BUFF_SIZE];
+    memset(buff, 0, TEST_BUFF_SIZE);
+    read(fdToSendTo, buff, TEST_BUFF_SIZE);
+    std::string dataRead(buff);
+    REQUIRE(dataToSend == dataRead);
 }
