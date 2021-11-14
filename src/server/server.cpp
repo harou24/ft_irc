@@ -80,6 +80,7 @@ void    Server::handleClientData(const int fd)
     }
     else
     {
+        this->receivedMessages.push_back(data);
         cl.setData(data);
     }
     std::cout << cl;

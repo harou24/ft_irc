@@ -2,6 +2,7 @@
 # define SERVER_HPP
 
 # include <map>
+# include <vector>
 # include <stdexcept>
 
 # include "../client/client.hpp"
@@ -16,6 +17,7 @@ class Server : public TcpConnection {
         int                     nbConnectedClients;
 
     public:
+        std::vector<std::string> receivedMessages;
         Server(void);
         Server(const char *port);
         ~Server(void);
