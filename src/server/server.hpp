@@ -31,7 +31,6 @@ class Server : public TcpConnection {
         void    removeClient(const Client &cl);
         void    acceptClientConnection(Client *cl);
         Client  getClient(const int fd);
-        Client  getClient(const int fd);
         std::string  getClientIp(struct sockaddr_storage remoteAddr);
 
         bool        isClientConnecting(int fd);

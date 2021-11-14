@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include <string.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 #define CLIENT_MSG "-------------Hello World From Client-------------"

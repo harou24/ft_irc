@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <arpa/inet.h>
+#include <stdio.h>
 
 #define MAX_PENDING_CONNECTION 10
 #define MAX_BUFF_SIZE 256
