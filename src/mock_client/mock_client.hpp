@@ -12,6 +12,7 @@ class MockClient : public Client {
         ~MockClient(void);
 
         void        connectToServer(void);
+        void        runCommunicationWithServer(void);
 
 };
 

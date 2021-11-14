@@ -77,6 +77,13 @@ int    TcpConnection::applyFunctionToAddresses(t_ptrToFunction function, struct 
 
     for(tmpAddrInfo = addresses; tmpAddrInfo != NULL; tmpAddrInfo = tmpAddrInfo->ai_next)
     {
+        char hostname[20];
+        memset(hostname, 0, 20);
+        int res = getlogin_r(hostname, 20);
+        if (res == -1)
+            return -1;
+        printf("hostname->%s\n",hostname);
+        printf("canonname->%s\n",tmpAddrInfo->ai_canonname);
         fd = socket(tmpAddrInfo->ai_family, tmpAddrInfo->ai_socktype, tmpAddrInfo->ai_protocol);
         if (fd < 0)
             continue;

@@ -13,6 +13,7 @@ class Server : public TcpConnection {
 
     private:
         std::map<int, Client>   clients;
+        int                     nbConnectedClients;
 
     public:
         Server(void);
@@ -30,7 +31,13 @@ class Server : public TcpConnection {
         void    removeClient(const Client &cl);
         void    acceptClientConnection(Client *cl);
         Client  getClient(const int fd);
+        Client  getClient(const int fd);
         std::string  getClientIp(struct sockaddr_storage remoteAddr);
+
+        bool        isClientConnecting(int fd);
+
+        int         getNbConnectedClients(void) const;
+        void        setNbConnectedClients(const int nbConnected);
 
 };
 

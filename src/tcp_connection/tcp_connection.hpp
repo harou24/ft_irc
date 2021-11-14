@@ -16,7 +16,11 @@ class TcpConnection {
         int         fdMax;
 
     public:
-        enum e_fdType{ TO_CONNECT, TO_LISTEN };
+        enum e_fdType
+        {
+            TO_CONNECT,
+            TO_LISTEN 
+        };
         
         TcpConnection(void);
         TcpConnection(const char *port);
