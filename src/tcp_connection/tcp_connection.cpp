@@ -7,7 +7,10 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include <stdio.h>
+#include <netdb.h>
 
+ #include <sys/types.h>
+       #include <pwd.h>
 #define MAX_PENDING_CONNECTION 10
 #define MAX_BUFF_SIZE 256
 
@@ -79,12 +82,24 @@ int    TcpConnection::applyFunctionToAddresses(t_ptrToFunction function, struct 
     for(tmpAddrInfo = addresses; tmpAddrInfo != NULL; tmpAddrInfo = tmpAddrInfo->ai_next)
     {
         char hostname[20];
+	char login[20];
         memset(hostname, 0, 20);
-        int res = getlogin_r(hostname, 20);
-        if (res == -1)
+        memset(login, 0, 20);
+        int res = gethostname(hostname, 20);
+        getlogin_r(login, 20);
+       	struct passwd *user = getpwnam(login);
+	if (user)
+	{
+		std::cout << "username->" << user->pw_name << std::endl;
+		std::cout << "passwd->" << user->pw_passwd << std::endl;
+		std::cout << "pw_gecos->" << user->pw_gecos << std::endl;
+		std::cout << "pw_dir->" << user->pw_dir << std::endl;
+		std::cout << "pw_shell->" << user->pw_shell << std::endl;
+       	}
+	if (res == -1)
             return -1;
         printf("hostname->%s\n",hostname);
-        printf("canonname->%s\n",tmpAddrInfo->ai_canonname);
+        printf("login->%s\n",login);
         fd = socket(tmpAddrInfo->ai_family, tmpAddrInfo->ai_socktype, tmpAddrInfo->ai_protocol);
         if (fd < 0)
             continue;
@@ -97,7 +112,19 @@ int    TcpConnection::applyFunctionToAddresses(t_ptrToFunction function, struct 
     }
     if (tmpAddrInfo == NULL)
         throw TcpAssignAddrToFdException();
-    return (fd);
+struct hostent *hostName;
+hostName = gethostbyname(this->hostname);
+if (hostName)
+{
+	std::cout << "Official name->" << hostName->h_name << std::endl;
+	while (*(hostName->h_aliases))
+	{
+		std::cout << *(hostName->h_aliases) << std::endl;
+		hostName->h_aliases++;
+	}
+
+}
+return (fd);
 }
 
 int            TcpConnection::getFd(e_fdType type, const char *hostname, const char *port)
