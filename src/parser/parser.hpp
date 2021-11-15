@@ -6,7 +6,7 @@
 
 class Parser {
 	private:
-		
+        std::string str;
 	public:
 		Parser(void);
 		Parser(const std::string &strToParse);

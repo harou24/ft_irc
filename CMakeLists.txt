@@ -24,7 +24,8 @@ add_library(ft_irc src/server/server.cpp
                     src/mock_server/mock_server.cpp 
                     src/irc_server/irc_server.cpp 
                     src/irc_client/irc_client.cpp 
-                    src/client/ostream_client.cpp)
+                    src/client/ostream_client.cpp
+                    src/parser/parser.cpp)
 
 add_subdirectory(apps)
 include(CTest)
