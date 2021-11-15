@@ -20,45 +20,13 @@ add_library(ft_irc src/server/server.cpp
                     src/tcp_connection/tcp_utils.cpp
                     src/tcp_connection/tcp_exceptions.cpp
                     src/client/client.cpp 
+                    src/mock_client/mock_client.cpp 
+                    src/mock_server/mock_server.cpp 
+                    src/irc_server/irc_server.cpp 
                     src/irc_client/irc_client.cpp 
                     src/client/ostream_client.cpp)
 
-add_executable(server.out apps/server.cpp
-                            src/server/server.cpp                
-                            src/tcp_connection/tcp_connection.cpp
-                            src/tcp_connection/tcp_utils.cpp
-                            src/tcp_connection/tcp_exceptions.cpp
-                            src/client/client.cpp 
-                            src/irc_client/irc_client.cpp 
-                            src/client/ostream_client.cpp)
-
-add_executable(irc_server.out apps/irc_server.cpp
-                            src/server/server.cpp                
-                            src/tcp_connection/tcp_connection.cpp
-                            src/tcp_connection/tcp_utils.cpp
-                            src/tcp_connection/tcp_exceptions.cpp
-                            src/client/client.cpp 
-                            src/irc_client/irc_client.cpp 
-                            src/irc_server/irc_server.cpp 
-                            src/client/ostream_client.cpp)
-
-add_executable(mock_client.out apps/mock_client.cpp
-                            src/tcp_connection/tcp_connection.cpp
-                            src/tcp_connection/tcp_utils.cpp
-                            src/tcp_connection/tcp_exceptions.cpp
-                            src/client/client.cpp 
-                            src/client/ostream_client.cpp
-                            src/irc_client/irc_client.cpp
-                            src/mock_client/mock_client.cpp)
-
-add_executable(irc_client.out apps/irc_client.cpp
-                            src/tcp_connection/tcp_connection.cpp
-                            src/tcp_connection/tcp_utils.cpp
-                            src/tcp_connection/tcp_exceptions.cpp
-                            src/client/client.cpp 
-                            src/client/ostream_client.cpp
-                            src/irc_client/irc_client.cpp
-                            src/mock_client/mock_client.cpp)
+add_subdirectory(apps)
 include(CTest)
 include(FetchContent)
 add_subdirectory(tests)
