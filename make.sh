@@ -22,8 +22,10 @@ create_cpp_header ()
         echo "NB ARG ERROR";
     else
         touch $1;
-        echo "#ifndef ${1^^}" | sed -r 's/[.]+/_/g'  >> $1;
-        echo "# define ${1^^}" | sed -r 's/[.]+/_/g' >> $1;
+        echo -n "#ifndef " > $1; 
+        echo -n $1 | tr '[a-z]' '[A-Z]' | sed -E 's/[.]+/_/g'  >> $1;
+        echo -n "# define " >> $1;
+        echo -n $1 | tr '[a-z]' '[A-Z]' | sed -E 's/[.]+/_/g' >> $1;
         printf "\n\n\n\n\n\n\n\n\n\n\n" >> $1;
         echo "#endif" >> $1;
     fi
