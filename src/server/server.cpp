@@ -10,9 +10,9 @@
 #define WELCOME_MSG "------- Welcome to the server ! -------\n"
 
 
-Server::Server(void): TcpConnection("8080") { }
+Server::Server(void): TcpConnection("8080"), nbConnectedClients(0) { }
 
-Server::Server(const char *port): TcpConnection(port) { }
+Server::Server(const char *port): TcpConnection(port), nbConnectedClients(0) { }
 
 Server::~Server(void) { }
 
@@ -35,6 +35,7 @@ void    Server::handleNewClient(void)
     sendGreetingMsg(cl);
     std::cout << cl;
     this->clients.insert(std::pair<int, Client>(cl.getFd(), cl));
+    this->nbConnectedClients++;
 }
 
 Client    Server::getClient(const int fd)
@@ -79,6 +80,7 @@ void    Server::handleClientData(const int fd)
     }
     else
     {
+        this->receivedMessages.push_back(data);
         cl.setData(data);
     }
     std::cout << cl;
@@ -102,6 +104,11 @@ void    Server::acceptClientConnection(Client *cl)
     std::cout << "New connection ...\n";
 }
 
+bool    Server::isClientConnecting(int fd)
+{
+    return (fd == this->getListenerFd());
+}
+
 void    Server::runOnce(void)
 {
     try
@@ -117,7 +124,7 @@ void    Server::runOnce(void)
 
         if (isFdReadyForCommunication(fd))
         {
-            if (fd == this->getListenerFd())
+            if (isClientConnecting(fd))
                 this->handleNewClient();
             else
                 this->handleClientData(fd);

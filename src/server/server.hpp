@@ -2,6 +2,7 @@
 # define SERVER_HPP
 
 # include <map>
+# include <vector>
 # include <stdexcept>
 
 # include "../client/client.hpp"
@@ -13,8 +14,10 @@ class Server : public TcpConnection {
 
     private:
         std::map<int, Client>   clients;
+        int                     nbConnectedClients;
 
     public:
+        std::vector<std::string> receivedMessages;
         Server(void);
         Server(const char *port);
         ~Server(void);
@@ -31,6 +34,11 @@ class Server : public TcpConnection {
         void    acceptClientConnection(Client *cl);
         Client  getClient(const int fd);
         std::string  getClientIp(struct sockaddr_storage remoteAddr);
+
+        bool        isClientConnecting(int fd);
+
+        int         getNbConnectedClients(void) const;
+        void        setNbConnectedClients(const int nbConnected);
 
 };
 

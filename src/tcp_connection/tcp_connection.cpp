@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <arpa/inet.h>
+#include <stdio.h>
+#include <netdb.h>
 
 #define MAX_PENDING_CONNECTION 10
 #define MAX_BUFF_SIZE 256
@@ -148,7 +150,7 @@ std::string TcpConnection::getDataFromFd(int fd)
     int nbytes;
     char buf[MAX_BUFF_SIZE];
 
-    if ((nbytes = recv(fd, buf, sizeof(buf), 0)) <= 0)
+    if ((nbytes = read(fd, buf, sizeof(buf))) <= 0)
     {
         if (nbytes == 0)
             std::cout << "TCP Connection lost !\n";

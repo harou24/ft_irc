@@ -8,5 +8,6 @@ int     main(int argc, char **argv)
         return (EXIT_FAILURE);
     MockClient cl(argv[1], argv[2]);
     cl.connectToServer();
+    cl.runCommunicationWithServer();
     return (EXIT_SUCCESS);
 }
