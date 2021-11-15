@@ -16,46 +16,47 @@ Server::Server(const char *port): TcpConnection(port), nbConnectedClients(0) { }
 
 Server::~Server(void) { }
 
-void    Server::sendGreetingMsg(const Client &cl) const
+void    Server::sendGreetingMsg(const Client *cl) const
 {
-    this->sendDataToFd(cl.getFd(), WELCOME_MSG);
+    this->sendDataToFd(cl->getFd(), WELCOME_MSG);
 }
 
 void    Server::handleNewClient(void)
 {
-    Client cl;
+    Client *cl = new Client();
     try 
     {
-        this->acceptClientConnection(&cl);
+        this->acceptClientConnection(cl);
     }
     catch(TcpAcceptException &e)
     {
         std::cerr << e.what() << std::endl;
     }
     sendGreetingMsg(cl);
-    std::cout << cl;
-    this->clients.insert(std::pair<int, Client>(cl.getFd(), cl));
+    std::cout << *cl;
+    this->clients.insert(std::pair<int, Client*>(cl->getFd(), cl));
     this->nbConnectedClients++;
 }
 
-Client    Server::getClient(const int fd)
+Client*    Server::getClient(const int fd)
 {
-    std::map<int, Client>::iterator it;
+    std::map<int, Client*>::iterator it;
     it = this->clients.find(fd);
     return(it->second);
 }
 
-void    Server::removeClient(const Client &cl)
+void    Server::removeClient(const Client *cl)
 {
-        std::map<int, Client>::iterator it;
-        it = this->clients.find(cl.getFd());
+        std::map<int, Client*>::iterator it;
+        it = this->clients.find(cl->getFd());
+        //delete(it->second);
         this->clients.erase(it);
 }
 
-void    Server::handleClientRemoval(const Client &cl)
+void    Server::handleClientRemoval(const Client *cl)
 {
-        close(cl.getFd());
-        removeFdFromSet(cl.getFd(), this->getMasterFds());
+        close(cl->getFd());
+        removeFdFromSet(cl->getFd(), this->getMasterFds());
         this->removeClient(cl);
 }
 
@@ -72,18 +73,19 @@ void    Server::handleClientData(const int fd)
         std::cerr << e.what() << std::endl;
     }
 
-    Client cl = this->getClient(fd);
+    Client *cl = this->getClient(fd);
     if (data.empty())
     {
-        cl.setConnected(false);
+        cl->setConnected(false);
+        this->nbConnectedClients--;
         this->handleClientRemoval(cl);
     }
     else
     {
         this->receivedMessages.push_back(data);
-        cl.setData(data);
+        cl->setData(data);
     }
-    std::cout << cl;
+    std::cout << *cl;
 }
 
 std::string  Server::getClientIp(struct sockaddr_storage remoteAddr)
@@ -140,3 +142,7 @@ void    Server::start(void)
         this->runOnce();
     }
 }
+
+std::map<int, Client*>   Server::getClients(void) const { return (this->clients); }
+
+int                      Server::getNbConnectedClients(void) const { return (this->nbConnectedClients); }
