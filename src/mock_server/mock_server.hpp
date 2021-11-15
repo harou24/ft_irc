@@ -1,7 +1,9 @@
 #ifndef MOCK_SERVER_HPP
 # define MOCK_SERVER_HPP
 
-class MockServer {
+# include "../server/server.hpp"
+
+class MockServer : public Server {
     public:
         MockServer(void);
         ~MockServer(void);
