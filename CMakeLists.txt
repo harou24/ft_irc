@@ -25,6 +25,7 @@ add_library(ft_irc src/server/server.cpp
                     src/irc_server/irc_server.cpp 
                     src/irc_client/irc_client.cpp 
                     src/client/ostream_client.cpp
+                    src/cmd_parser/cmd_parser.cpp
                     src/parser/parser.cpp)
 
 add_subdirectory(apps)

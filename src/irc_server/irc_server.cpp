@@ -1,4 +1,5 @@
 #include "irc_server.hpp"
+#include "../cmd_parser/cmd_parser.hpp"
 
 IrcServer::IrcServer(void) : Server() { }
 
@@ -15,14 +16,13 @@ void    IrcServer::start(void)
         if (!this->receivedMessages.empty())
         {
             std::string command = this->receivedMessages.back();
-            std::cout << command << std::endl;
-            std::string cmd = "PRIVMSG";
-            if (command.find(cmd) != std::string::npos)
+            std::cout << "command->" << command << std::endl;
+            CmdParser *cmd = new CmdParser(command);
+            if (cmd->getType() == PRIVMSG)
             {
-                std::cout << "PRIVMSG" << std::endl;
+                std::cout << "PRIVMSG type->" << cmd->getCmd() << std::endl;
             }
-                
-            
+           delete(cmd);
         }
     }
 }
