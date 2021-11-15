@@ -21,6 +21,7 @@ create_cpp_header ()
     if [ $# -ne 1 ]; then
         echo "NB ARG ERROR";
     else
+        echo "creating $1 ...";
         touch $1;
         echo -n "#ifndef " > $1; 
         echo  $1 | tr '[a-z]' '[A-Z]' | sed -E 's/[.]+/_/g'  >> $1;
@@ -31,19 +32,36 @@ create_cpp_header ()
     fi
 }
 
+create_cpp_file ()
+{
+    echo "creating $1.cpp ...";
+    touch "$1.cpp";
+    echo -n "#include " > $1.cpp;
+    echo -n '"' >> $1.cpp;
+    echo -n "$1.hpp" >> $1.cpp;
+    echo '"' >> $1.cpp;
+}
+
+create_cpp_module ()
+{
+    echo "creating module $1 ...";
+    mkdir -p $SRC_FOLDER/$1;
+    cd $SRC_FOLDER/$1/;
+    create_cpp_header "$1.hpp";
+    create_cpp_file $1;
+}
+
 run_cmake ()
 {
-
     if [ "$1" == "build" ]; then
         mkdir -p $BUILD_FOLDER && cmake -S . -B $BUILD_FOLDER && cmake --$BUILD_FOLDER $BUILD_FOLDER;
     elif [ "$1" == "clean" ]; then
-        git clean -d -f -X &&  rm -rf build;
+        git clean -d -f -X &&  rm -rf $BUILD_FOLDER;
     elif [ "$1" == "test" ]; then
-        mkdir -p build &&
-            cmake -S . -B build && 
-            cmake --build build && 
-            cd build && ctest --output-on-failure;
-
+        mkdir -p $BUILD_FOLDER &&
+            cmake -S . -B $BUILD_FOLDER && 
+            cmake --$BUILD_FOLDER $BUILD_FOLDER && 
+            cd $BUILD_FOLDER && ctest --output-on-failure;
     fi
 }
 
