@@ -9,9 +9,9 @@ Parser::Parser(const std::string &strToParse) : str(strToParse) { }
 
 Parser::~Parser(void) { }
 
-std::vector<std::string>    Parser::strSplit(void) { return (this->strSplit(this->str)); }
+std::vector<std::string>    Parser::split(void) { return (this->split(this->str)); }
 
-std::vector<std::string>    Parser::strSplit(std::string &str)
+std::vector<std::string>    Parser::split(const std::string &str)
 { 
     std::vector<std::string> tokens;
     std::stringstream streamStr(str);

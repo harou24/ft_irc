@@ -12,8 +12,8 @@ class Parser {
 		Parser(const std::string &strToParse);
 		~Parser(void);
 
-		std::vector<std::string>  strSplit(void);
-		std::vector<std::string>  strSplit(std::string &str);
+		std::vector<std::string>  split(void);
+		std::vector<std::string>  split(const std::string &str);
 
 
 
