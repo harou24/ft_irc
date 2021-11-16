@@ -1,18 +1,21 @@
 #include "server.hpp"
+#include "ostream_server.hpp"
+#include "../client/ostream_client.hpp"
 #include "../tcp_connection/tcp_utils.hpp"
 #include "../tcp_connection/tcp_exceptions.hpp"
-#include "../client/ostream_client.hpp"
 
 #include <unistd.h>
 #include <arpa/inet.h>
 
+#include <ctime>
+#include <time.h>
 
 #define WELCOME_MSG "------- Welcome to the server ! -------\n"
 
 
-Server::Server(void): TcpConnection("8080"), nbConnectedClients(0) { }
+Server::Server(void): TcpConnection("8080"), clients(new std::map<int, Client*>()), nbConnectedClients(0) { }
 
-Server::Server(const char *port): TcpConnection(port), nbConnectedClients(0) { }
+Server::Server(const char *port): TcpConnection(port), clients(new std::map<int, Client*>()), nbConnectedClients(0) { }
 
 Server::~Server(void) { }
 
@@ -33,24 +36,22 @@ void    Server::handleNewClient(void)
         std::cerr << e.what() << std::endl;
     }
     sendGreetingMsg(cl);
-    std::cout << *cl;
-    this->clients.insert(std::pair<int, Client*>(cl->getFd(), cl));
+    this->clients->insert(std::pair<int, Client*>(cl->getFd(), cl));
     this->nbConnectedClients++;
 }
 
 Client*    Server::getClient(const int fd)
 {
     std::map<int, Client*>::iterator it;
-    it = this->clients.find(fd);
+    it = this->clients->find(fd);
     return(it->second);
 }
 
 void    Server::removeClient(const Client *cl)
 {
         std::map<int, Client*>::iterator it;
-        it = this->clients.find(cl->getFd());
-        //delete(it->second);
-        this->clients.erase(it);
+        it = this->clients->find(cl->getFd());
+        this->clients->erase(it);
 }
 
 void    Server::handleClientRemoval(const Client *cl)
@@ -85,7 +86,6 @@ void    Server::handleClientData(const int fd)
         this->receivedMessages.push_back(data);
         cl->setData(data);
     }
-    std::cout << *cl;
 }
 
 std::string  Server::getClientIp(struct sockaddr_storage remoteAddr)
@@ -113,6 +113,7 @@ bool    Server::isClientConnecting(int fd)
 
 void    Server::runOnce(void)
 {
+    std::cout << *this;
     try
     {
         this->updateFdsInSet();
@@ -143,6 +144,16 @@ void    Server::start(void)
     }
 }
 
-std::map<int, Client*>   Server::getClients(void) const { return (this->clients); }
+std::map<int, Client*>*   Server::getClients(void) const { return (this->clients); }
 
 int                      Server::getNbConnectedClients(void) const { return (this->nbConnectedClients); }
+
+std::string             Server::getLocalTime(void) const
+{
+    time_t rawtime;
+    struct tm * timeinfo;
+    time (&rawtime);
+    timeinfo = localtime (&rawtime);
+    return(std::string(asctime(timeinfo)));
+}
+

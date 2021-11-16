@@ -3,6 +3,7 @@
 #configuration
 BUILD_FOLDER="build"
 SRC_FOLDER="src"
+APPS_FOLDER="apps"
 
 display_info ()
 {
@@ -13,6 +14,7 @@ display_info ()
     echo "  test               run unitests";
     echo "  create             generate .cpp/.hpp files, generate cpp module";
     echo "  save               create a save branch and push on github";
+    echo "  run                run executable in APPS_FOLDER";
 }
 
 
@@ -88,7 +90,7 @@ if [ $# -eq 1 ]; then
     elif [ "$1" == "save" ]; then
         save
     else
-        echo "CMD NOT FOUND\n";
+        echo "NB_ARG Error : build | clean | test | -h / --help\n";
     fi
 elif [ $# -eq 2 ]; then
     if [ "$1" == "create" ]; then

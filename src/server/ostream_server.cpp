@@ -1,13 +1,16 @@
+#include "ostream_server.hpp"
 #include "ostream_client.hpp"
+
 #include <sstream>
 
 std::ostream &operator << (std::ostream &output , const Server &s)
 {
-    output << "-------------------Server-------------------" << std::endl << std::endl;
-    output << "Connected clients : " << s.nbConnectedClients << std::endl;
-    for (int i = 0; i < s.nbConnectedClients; i++)
-    {
-        output << s.clients.at(i)
-    }
+    output << "Server {\n";
+    output << "                 DATE:              " << s.getLocalTime();
+    output << "                 NB_CONNECTED:      " << s.getNbConnectedClients() << std::endl;
+    output << "                 CLIENTS:           "  << std::endl;
+    if (s.getClients()->size() > 0)
+        output << "                      " << *(s.getClients()->at(5));
+    output << "}\n";
 	return (output);
 }

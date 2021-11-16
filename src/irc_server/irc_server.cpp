@@ -14,11 +14,9 @@ void    IrcServer::start(void)
     while (true)
     {
         this->runOnce();
-        std::cout << "Nb Connected->" << this->getNbConnectedClients() << std::endl;
         if (!this->receivedMessages.empty())
         {
             std::string command = this->receivedMessages.back();
-            std::cout << "command->" << command << std::endl;
             CmdParser *cmd = new CmdParser(command);
             if (cmd->getType() == PRIVMSG)
             {
