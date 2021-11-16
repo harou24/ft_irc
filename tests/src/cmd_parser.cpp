@@ -33,7 +33,7 @@ TEST_CASE("test if cmd str is splited correctly in tokens", "[CMD_PARSER]")
     CmdParser cmd("PRIVMSG hello :this is the message");
     REQUIRE(cmd.getTokens()[0] == "PRIVMSG");
     REQUIRE(cmd.getTokens()[1] == "hello");
-    REQUIRE(cmd.getTokens()[2] == ":this is the message");
+    REQUIRE(cmd.getTokens()[2] == "this is the message");
 }
 
 TEST_CASE("getUser()", "[CMD_PARSER]")

@@ -59,6 +59,7 @@ class CmdParser : public Parser {
         t_unknown   getUnknown(void) const;
 
         std::vector<std::string>        getTokens(void);
+        std::vector<std::string>        split(const std::string &cmd);
 };
 
 #endif
