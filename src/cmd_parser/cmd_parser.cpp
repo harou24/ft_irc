@@ -2,48 +2,59 @@
 
 CmdParser::CmdParser(void) { }
 
-CmdParser::CmdParser(const std::string &cmd)
+CmdParser::CmdParser(const std::string &cmd) : Parser()
 {
-    std::vector<std::string> tokens = this->split(cmd);
-    if (tokens.front() == "PRIVMSG")
-    {
-        this->cmd = tokens[0];
-        this->type = PRIVMSG;
-        this->nickName = tokens[1];
-        for (size_t i = 2; i < tokens.size(); i++)
-        {
-            this->msg += tokens[i];
-            if (i != tokens.size() - 1)
-                this->msg += ' ';
-        }
-        this->msg.erase(0, 1);
-    }
+    this->cmd = cmd;
+    this->setType();
+    this->tokens = this->Parser::split(cmd);
 }
 
 CmdParser::~CmdParser(void) { }
 
-void            CmdParser::parse(const std::string &cmd)
+void        CmdParser::setType(void)
 {
-    std::vector<std::string> tokens = this->split(cmd);
-    if (tokens[0] == "PRIVMSG")
-    {
-        this->cmd = tokens[0];
+    if (this->cmd.find("NICK") != std::string::npos)
+        this->type = NICK;
+    else if (this->cmd.find("USER") != std::string::npos)
+        this->type = USER;
+    else if (this->cmd.find("PRIVMSG") != std::string::npos)
         this->type = PRIVMSG;
-        this->nickName = tokens[1];
-        for (size_t i = 2; i < tokens.size(); i++)
-        {
-            this->msg += tokens[i];
-            if (i != tokens.size() - 1)
-                this->msg += ' ';
-        }
-        this->msg.erase(0, 1);
-    }
+    else
+        this->type = UNKNOWN;
 }
 
-std::string     CmdParser::getNickName(void) const { return (this->nickName); }
+t_nick     CmdParser::getNick(void) const
+{
+    t_nick nick;
+    nick.nickName = tokens[1];
+    return (nick);
+}
 
-std::string     CmdParser::getMsg(void) const { return (this->msg); }
+t_user     CmdParser::getUser(void) const
+{
+    t_user user;
+    user.userName = tokens[1];
+    user.hostName = tokens[2];
+    user.serverName = tokens[3];
+    user.realName = tokens[4];
+    return (user);
+}
 
-std::string     CmdParser::getCmd(void) const { return (this->cmd); }
+t_privMsg     CmdParser::getPrivMsg(void) const
+{
+    t_privMsg privmsg;
+    privmsg.nickName = tokens[1];
+    privmsg.msg = tokens[2];
+    return (privmsg);
+}
 
-e_type          CmdParser::getType(void) const { return (this->type); }
+t_unknown  CmdParser::getUnknown(void) const
+{
+    t_unknown unknown;
+    unknown.error = std::string("Error cmd");
+    return (unknown);
+}
+
+e_type      CmdParser::getType(void) const { return this->type; }
+
+std::vector<std::string> CmdParser::getTokens(void) { return (this->tokens); }

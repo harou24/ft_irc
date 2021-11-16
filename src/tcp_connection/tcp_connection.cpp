@@ -89,8 +89,14 @@ int    TcpConnection::applyFunctionToAddresses(t_ptrToFunction function, struct 
         }
         break;
     }
+    freeAddrInfo(addresses);
     if (tmpAddrInfo == NULL)
+    {
+        close(this->connectingFd);
+        close(this->listenerFd);
         throw TcpAssignAddrToFdException();
+
+    }
     return (fd);
 }
 
@@ -107,7 +113,6 @@ int            TcpConnection::getFd(e_fdType type, const char *hostname, const c
         std::cerr << e.what();
     }
     int  fd = this->findFd(type, addrInfo);
-    freeAddrInfo(addrInfo);
     return (fd);
 }
 

@@ -3,6 +3,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <errno.h>
 
 #include <iostream>
 
@@ -67,7 +68,10 @@ void    dieWithMsg(const char *msg)
 
 int     assignAddrToFd(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 {
-    return(bind(sockfd, addr, addrlen));
+    int     ret = bind(sockfd, addr, addrlen);
+    if (ret == -1)
+        std::cout << "bind() error, value of errno is " << errno << "\nError : " << strerror(errno) << "\n";
+    return(ret);
 }
 
 int     connectFdToAddr(int sockfd, const struct sockaddr *addr, socklen_t addrlen)

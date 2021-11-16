@@ -20,7 +20,6 @@ class IrcServer : public Server {
 
         void    start(void);
         void    sendPrivMsg();
-
 };
 
 #endif

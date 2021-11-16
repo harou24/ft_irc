@@ -18,10 +18,24 @@ void    IrcServer::start(void)
         {
             std::string command = this->receivedMessages.back();
             CmdParser *cmd = new CmdParser(command);
-            if (cmd->getType() == PRIVMSG)
+            /*
+            if (cmd->getType() == NICK)
             {
-                std::cout << "PRIVMSG type->" << cmd->getCmd() << std::endl;
+                t_nick *nick = (t_nick *)cmd->getCmd();
             }
+            else if (cmd->getType() == USER)
+            {
+                t_user *user = (t_user *)cmd->getCmd();
+            }
+            else if (cmd->getType() == PRIVMSG)
+            {
+                t_privMsg *privmsg = (t_privMsg *)cmd->getCmd();
+            }
+            else
+            {
+                t_unknown *unknown = (t_unknown *)cmd->getCmd();
+            }
+            */
            delete(cmd);
         }
     }

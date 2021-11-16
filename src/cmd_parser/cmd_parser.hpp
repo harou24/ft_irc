@@ -8,15 +8,40 @@ enum e_type
     NICK,
     USER,
     PRIVMSG,
-    UKNOWN
+    UNKNOWN
 };
 
+typedef struct  s_nick
+{
+    std::string nickName;
+}               t_nick;
+
+typedef struct  s_privMsg
+{
+    std::string nickName;
+    std::string msg;
+}               t_privMsg;
+
+typedef struct  s_user
+{
+        std::string userName;
+        std::string hostName;
+        std::string serverName;
+        std::string realName;
+}                t_user;
+
+typedef struct  s_unknown
+{
+    std::string error;
+}               t_unknown;
+
 class CmdParser : public Parser {
+    
     private:
         e_type      type;
         std::string cmd;
-        std::string nickName;
-        std::string msg;
+        std::vector<std::string> tokens;
+    
     public:
         CmdParser(void);
         CmdParser(const std::string &cmd);
@@ -24,12 +49,16 @@ class CmdParser : public Parser {
 
         void        parse(const std::string &cmd);
 
-        std::string getNickName(void) const;
-        std::string getMsg(void) const;
-        std::string getCmd(void) const;
         e_type      getType(void) const;
 
+        void        setType(void);
 
+        t_nick     getNick(void) const;
+        t_user     getUser(void) const;
+        t_privMsg  getPrivMsg(void) const;
+        t_unknown   getUnknown(void) const;
+
+        std::vector<std::string>        getTokens(void);
 };
 
 #endif
