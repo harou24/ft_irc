@@ -21,7 +21,10 @@ class Client : public TcpConnection {
         Client(void);
         Client(const int fd, const std::string &ip);
         Client(const char *hostname, const char *port);
-        ~Client(void);
+        Client(const Client &ct);
+        virtual ~Client(void);
+
+        Client& operator = (const Client &cl);
         
         void                    sendMsg(const int fd, std::string &msg);
         std::string             receiveMsg(const int fd);

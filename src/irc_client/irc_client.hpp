@@ -18,7 +18,10 @@ class IrcClient : public Client {
         IrcClient(const std::string &nickName);
         IrcClient(const char *hostName, const char *port);
         IrcClient(std::string &nickName, std::string &userName, std::string &hostName, std::string &serverName);
+        IrcClient(const IrcClient &cl);
         ~IrcClient(void);
+
+		IrcClient& operator = (const IrcClient &cl);
 
         void            runCommunicationWithServer(void);
         void            connectToServer(void);

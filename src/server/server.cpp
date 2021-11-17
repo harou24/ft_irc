@@ -36,6 +36,7 @@ void    Server::handleNewClient(void)
         std::cerr << e.what() << std::endl;
     }
     sendGreetingMsg(cl);
+    std::cout << "CLIENT ADD TO LIST->"<< *cl << std::endl;
     this->clients->insert(std::pair<int, Client*>(cl->getFd(), cl));
     this->nbConnectedClients++;
 }

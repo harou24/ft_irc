@@ -10,8 +10,24 @@ Client::Client(const char *hostname, const char *port) : TcpConnection(hostname,
 
 Client::Client(const int fd, const std::string &ip) : connected(false), fd(fd), ip(ip) { }
 
+Client::Client(const Client &cl)
+{
+    this->connected = cl.connected;
+    this->fd = cl.fd;
+    this->ip = cl.ip;
+    this->data = cl.data;
+}
+
 Client::~Client(void){ }
 
+Client& Client::operator = (const Client &cl)
+{
+    this->connected = cl.connected;
+    this->fd = cl.fd;
+    this->ip = cl.ip;
+    this->data = cl.data;
+    return (*this);
+}
 
 void            Client::sendMsg(const int fd, std::string &msg) { this->sendDataToFd(fd, msg); }
 
