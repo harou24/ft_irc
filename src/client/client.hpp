@@ -19,7 +19,7 @@ class Client : public TcpConnection {
 
     public:
         Client(void);
-        Client(const int fd, const std::string &ip);
+        Client(const int fd);
         Client(const char *hostname, const char *port);
         Client(const Client &ct);
         virtual ~Client(void);

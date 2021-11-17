@@ -9,7 +9,7 @@
 
 #define LOGIN_SIZE 20
 
-IrcClient::IrcClient(void) { }
+IrcClient::IrcClient(void) : Client() { }
 
 IrcClient::IrcClient(const char *hostName, const char *port) :
     Client(hostName, port)
@@ -25,7 +25,8 @@ IrcClient::IrcClient(const char *hostName, const char *port) :
 IrcClient::IrcClient(std::string &nickName,
                         std::string &userName,
                             std::string &hostName,
-                                std::string &serverName)
+                                std::string &serverName) :
+    Client()
 {
     this->nickName = nickName;
     this->userName = userName;
@@ -40,6 +41,8 @@ IrcClient::IrcClient(const IrcClient &cl ) : Client(cl)
     this->hostName = cl.hostName;
     this->serverName = cl.serverName;
 }
+
+IrcClient::IrcClient(const Client &cl ) : Client(cl) { }
 
 IrcClient::~IrcClient(void) { }
 

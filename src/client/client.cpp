@@ -8,7 +8,7 @@ Client::Client(void) : connected(false), fd(-1)  { }
 
 Client::Client(const char *hostname, const char *port) : TcpConnection(hostname, port) { }
 
-Client::Client(const int fd, const std::string &ip) : connected(false), fd(fd), ip(ip) { }
+Client::Client(const int fd) : connected(false), fd(fd) { }
 
 Client::Client(const Client &cl)
 {

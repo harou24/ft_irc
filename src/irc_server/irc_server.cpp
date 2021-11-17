@@ -12,9 +12,10 @@ void    IrcServer::nick(const t_nick &nick)
     if (this->Server::getNbConnectedClients() > 0 && this->Server::getClients()->size() > 0)
     {
         Client *c = this->Server::getClients()->rbegin()->second;
-        IrcClient *cl = static_cast<IrcClient*>(c);
+        IrcClient *cl = dynamic_cast<IrcClient*>(c);
+        
         if (!cl)
-            exit(1);
+           exit(1);
         // cl->setNickName(nick.nickName);
         //cl->setUserName(nick.nickName);
         std::cout << "NICKNAME->" << cl->getNickName() << std::endl;

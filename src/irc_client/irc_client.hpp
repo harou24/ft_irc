@@ -22,6 +22,7 @@ class IrcClient : public Client {
                         std::string &hostName,
                             std::string &serverName);
         IrcClient(const IrcClient &cl);
+        IrcClient(const Client &cl);
         ~IrcClient(void);
 
 		IrcClient& operator = (const IrcClient &cl);
