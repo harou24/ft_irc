@@ -24,6 +24,9 @@ class IrcServer : public Server {
         void    privMsg(const t_privMsg &privMsg);
         void    user(const t_user &user);
         void    unknown(const t_unknown &unknown);
+
+
+        std::map<std::string, IrcClient*>   getUsers(void) const;
 };
 
 #endif

@@ -11,14 +11,16 @@ void    IrcServer::nick(const t_nick &nick)
 {
     if (this->Server::getNbConnectedClients() > 0 && this->Server::getClients()->size() > 0)
     {
-        Client *c = this->Server::getClients()->at(5);
-        IrcClient *cl = reinterpret_cast<IrcClient*>(c);
-        std::cout << cl << "==" << c << std::endl;
-        std::cout << "CLIENT->" << *c<< std::endl;
-        std::cout << "IRC_CLIENT->" << *cl<< std::endl;
+        Client *c = this->Server::getClients()->rbegin()->second;
+        IrcClient *cl = static_cast<IrcClient*>(c);
+        if (!cl)
+            exit(1);
+        // cl->setNickName(nick.nickName);
+        //cl->setUserName(nick.nickName);
+        std::cout << "NICKNAME->" << cl->getNickName() << std::endl;
         this->users.insert(std::pair<std::string, IrcClient*>(nick.nickName, cl));
+        std::cout << "IRC-CLIENT" << *cl << std::endl;
     }
-    std::cout << "NICK->" << nick.nickName << std::endl;
 }
 
 void    IrcServer::start(void)
@@ -54,5 +56,10 @@ void    IrcServer::start(void)
            delete(cmd);
         }
     }
+}
+
+std::map<std::string, IrcClient*> IrcServer::getUsers(void) const
+{
+    return (this->users);
 }
 
