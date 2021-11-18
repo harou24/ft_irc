@@ -42,11 +42,8 @@ std::vector<Message*>::iterator   IrcServer::getLastUnreadMsg(void)
     return (unreadMsg);
 }
 
-void    IrcServer::handleLastReceivedMessage(void)
+void    IrcServer::handleLastReceivedMessage(std::vector<Message*>::iterator lastMsg )
 {
-    std::vector<Message*>::iterator lastMsg = this->getLastUnreadMsg();
-    if (!*lastMsg) return ;
-
     std::string command = (*lastMsg)->getData();
     CmdParser *cmd = new CmdParser(command);
     if (cmd->getType() == NICK)
@@ -78,7 +75,9 @@ void    IrcServer::start(void)
     while (true)
     {
         this->runOnce();
-        this->handleLastReceivedMessage();
+        std::vector<Message*>::iterator lastMsg = this->getLastUnreadMsg();
+        if (this->getMessages()->size() > 0)
+            this->handleLastReceivedMessage(lastMsg);
     }
 }
 

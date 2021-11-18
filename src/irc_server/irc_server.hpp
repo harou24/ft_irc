@@ -32,7 +32,7 @@ class IrcServer : public Server {
         std::map<std::string, IrcClient*>   getUsers(void) const;
         std::vector<Message*>::iterator     getLastUnreadMsg(void);
 
-        void        handleLastReceivedMessage(void);
+        void        handleLastReceivedMessage(std::vector<Message*>::iterator lastMsg);
 };
 
 #endif
