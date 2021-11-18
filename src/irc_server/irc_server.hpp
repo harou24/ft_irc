@@ -4,14 +4,16 @@
 # include "../irc_client/irc_client.hpp"
 # include "../server/server.hpp"
 # include "../cmd_parser/cmd_parser.hpp"
+# include "../message/message.hpp"
+
 # include <map>
 # include <vector>
 # include <iostream>
 
 class IrcServer : public Server {
+
     private:
         std::map<std::string, IrcClient*> users;
-        std::vector<std::string> commands;
 
     public:
         IrcServer(void);
@@ -25,8 +27,12 @@ class IrcServer : public Server {
         void    user(const t_user &user);
         void    unknown(const t_unknown &unknown);
 
+        bool    userExists(const std::string &nickName) const;
 
         std::map<std::string, IrcClient*>   getUsers(void) const;
+        Message*    getLastUnreadMsg(void);
+
+        void        handleLastReceivedMessage(void);
 };
 
 #endif

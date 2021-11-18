@@ -13,9 +13,19 @@
 #define WELCOME_MSG "------- Welcome to the server ! -------\n"
 
 
-Server::Server(void): TcpConnection("8080"), clients(new std::map<int, Client*>()), nbConnectedClients(0) { }
+Server::Server(void) :
+    TcpConnection("8080"),
+            nbConnectedClients(0), 
+                clients(new std::map<int, Client*>()),
+                    messages(new std::vector<Message*>())
+{ }
 
-Server::Server(const char *port): TcpConnection(port), clients(new std::map<int, Client*>()), nbConnectedClients(0) { }
+Server::Server(const char *port) :
+    TcpConnection(port),
+            nbConnectedClients(0),
+                clients(new std::map<int, Client*>()),
+                    messages(new std::vector<Message*>())
+{ }
 
 Server::~Server(void) { }
 
@@ -36,7 +46,6 @@ void    Server::handleNewClient(void)
         std::cerr << e.what() << std::endl;
     }
     sendGreetingMsg(cl);
-    std::cout << "CLIENT ADD TO LIST->"<< *cl << std::endl;
     this->clients->insert(std::pair<int, Client*>(cl->getFd(), cl));
     this->nbConnectedClients++;
 }
@@ -84,7 +93,7 @@ void    Server::handleClientData(const int fd)
     }
     else
     {
-        this->receivedMessages.push_back(data);
+        this->messages->push_back(new Message(data));
         cl->setData(data);
     }
 }
@@ -145,9 +154,20 @@ void    Server::start(void)
     }
 }
 
-std::map<int, Client*>*   Server::getClients(void) const { return (this->clients); }
+std::map<int, Client*>*   Server::getClients(void) const
+{
+    return (this->clients);
+}
 
-int                      Server::getNbConnectedClients(void) const { return (this->nbConnectedClients); }
+std::vector<Message*>*   Server::getMessages(void) const
+{
+    return (this->messages);
+}
+
+int                      Server::getNbConnectedClients(void) const
+{ 
+    return (this->nbConnectedClients);
+}
 
 std::string             Server::getLocalTime(void) const
 {

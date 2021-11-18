@@ -7,21 +7,74 @@ IrcServer::IrcServer(const char *port) : Server(port) { }
 
 IrcServer::~IrcServer(void) { }
 
+bool    IrcServer::userExists(const std::string &nickName) const
+{
+    return (this->users.find(nickName) != this->users.end());
+}
+
 void    IrcServer::nick(const t_nick &nick)
 {
-    if (this->Server::getNbConnectedClients() > 0 && this->Server::getClients()->size() > 0)
+    if (this->Server::getNbConnectedClients() > 0)
     {
-        Client *c = this->Server::getClients()->rbegin()->second;
-        IrcClient *cl = dynamic_cast<IrcClient*>(c);
-        
-        if (!cl)
-           exit(1);
-        // cl->setNickName(nick.nickName);
-        //cl->setUserName(nick.nickName);
-        std::cout << "NICKNAME->" << cl->getNickName() << std::endl;
-        this->users.insert(std::pair<std::string, IrcClient*>(nick.nickName, cl));
-        std::cout << "IRC-CLIENT" << *cl << std::endl;
+        if (!this->userExists(nick.nickName))
+        {
+            Client c = *(this->Server::getClients()->rbegin()->second);
+            IrcClient cl = IrcClient(c);
+            cl.setNickName(nick.nickName);
+            this->users.insert(std::pair<std::string, IrcClient*>(nick.nickName, &cl));
+        }
+        else
+            this->users[nick.nickName]->setNickName(nick.nickName);
     }
+}
+
+void    IrcServer::user(const t_user &user)
+{
+    std::cout << user.hostName << std::endl; 
+}
+
+Message*    IrcServer::getLastUnreadMsg(void)
+{
+    Message *msg = NULL;
+    for (std::vector<Message*>::iterator it = this->getMessages()->begin() ; it != this->getMessages()->end(); ++it)
+    {
+        if (!((*it)->hasItBeenRead()))
+        {
+            msg = *it;
+            break ;
+        }
+    }
+    return (msg);
+}
+
+void    IrcServer::handleLastReceivedMessage(void)
+{
+    Message *last;
+    if (!(last = getLastUnreadMsg()))
+        return ;
+    std::string command = this->getMessages()->back()->getData();
+    CmdParser *cmd = new CmdParser(command);
+    if (cmd->getType() == NICK)
+    {
+        t_nick nick = cmd->getNick();
+        this->nick(nick);
+    }
+    else if (cmd->getType() == USER)
+    {
+        t_user user = cmd->getUser();
+        this->user(user);
+    }
+    else if (cmd->getType() == PRIVMSG)
+    {
+        t_privMsg privMsg = cmd->getPrivMsg();
+        std::cout << "PRIVMSG->" << privMsg.msg << std::endl;
+    }
+    else
+    {
+        t_unknown unknown = cmd->getUnknown();
+        std::cout << "UNKNOWN->" << unknown.error << std::endl;
+    }
+    delete(cmd);
 }
 
 void    IrcServer::start(void)
@@ -30,32 +83,7 @@ void    IrcServer::start(void)
     while (true)
     {
         this->runOnce();
-        if (!this->receivedMessages.empty())
-        {
-            std::string command = this->receivedMessages.back();
-            CmdParser *cmd = new CmdParser(command);
-            if (cmd->getType() == NICK)
-            {
-                t_nick nick = cmd->getNick();
-                this->nick(nick);
-            }
-            else if (cmd->getType() == USER)
-            {
-                t_user user = cmd->getUser();
-                std::cout << "USER->" << user.userName << std::endl;
-            }
-            else if (cmd->getType() == PRIVMSG)
-            {
-                t_privMsg privMsg = cmd->getPrivMsg();
-                std::cout << "PRIVMSG->" << privMsg.msg << std::endl;
-            }
-            else
-            {
-                t_unknown unknown = cmd->getUnknown();
-                std::cout << "UNKNOWN->" << unknown.error << std::endl;
-            }
-           delete(cmd);
-        }
+        this->handleLastReceivedMessage();
     }
 }
 
