@@ -33,26 +33,21 @@ void    IrcServer::user(const t_user &user)
     std::cout << user.hostName << std::endl; 
 }
 
-Message*    IrcServer::getLastUnreadMsg(void)
+std::vector<Message*>::iterator   IrcServer::getLastUnreadMsg(void)
 {
-    Message *msg = NULL;
-    for (std::vector<Message*>::iterator it = this->getMessages()->begin() ; it != this->getMessages()->end(); ++it)
-    {
-        if (!((*it)->hasItBeenRead()))
-        {
-            msg = *it;
-            break ;
-        }
-    }
-    return (msg);
+    std::vector<Message*>::iterator unreadMsg;
+    for (unreadMsg = this->getMessages()->begin(); unreadMsg != this->getMessages()->end(); unreadMsg++)
+        if (!((*unreadMsg)->hasItBeenRead()))
+            break;
+    return (unreadMsg);
 }
 
 void    IrcServer::handleLastReceivedMessage(void)
 {
-    Message *last;
-    if (!(last = getLastUnreadMsg()))
-        return ;
-    std::string command = this->getMessages()->back()->getData();
+    std::vector<Message*>::iterator lastMsg = this->getLastUnreadMsg();
+    if (!*lastMsg) return ;
+
+    std::string command = (*lastMsg)->getData();
     CmdParser *cmd = new CmdParser(command);
     if (cmd->getType() == NICK)
     {

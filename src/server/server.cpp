@@ -3,6 +3,7 @@
 #include "../client/ostream_client.hpp"
 #include "../tcp_connection/tcp_utils.hpp"
 #include "../tcp_connection/tcp_exceptions.hpp"
+#include "../parser/parser.hpp"
 
 #include <unistd.h>
 #include <arpa/inet.h>
@@ -93,7 +94,15 @@ void    Server::handleClientData(const int fd)
     }
     else
     {
-        this->messages->push_back(new Message(data));
+        if (data.find("\n") != std::string::npos)
+        {
+            Parser p;
+            std::vector<std::string> msgs = p.split(data, '\n');
+            for (std::vector<std::string>::iterator cmd = msgs.begin(); cmd != msgs.end(); cmd++)
+                this->messages->push_back(new Message(*cmd));
+        }
+        else
+            this->messages->push_back(new Message(data));
         cl->setData(data);
     }
 }
@@ -178,3 +187,9 @@ std::string             Server::getLocalTime(void) const
     return(std::string(asctime(timeinfo)));
 }
 
+void    Server::removeMsg(std::vector<Message*>::iterator toRemove)
+{
+    Message *msg = *toRemove;
+    this->messages->erase(toRemove);
+    delete(msg);
+}

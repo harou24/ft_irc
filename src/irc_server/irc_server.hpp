@@ -30,7 +30,7 @@ class IrcServer : public Server {
         bool    userExists(const std::string &nickName) const;
 
         std::map<std::string, IrcClient*>   getUsers(void) const;
-        Message*    getLastUnreadMsg(void);
+        std::vector<Message*>::iterator     getLastUnreadMsg(void);
 
         void        handleLastReceivedMessage(void);
 };

@@ -43,6 +43,9 @@ class Server : public TcpConnection {
 
         std::map<int, Client*>* getClients(void) const;
         std::vector<Message*>*  getMessages(void) const;
+
+        void    removeMsg(std::vector<Message*>::iterator toRemove);
+
 };
 
 #endif
