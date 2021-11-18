@@ -68,6 +68,7 @@ void    IrcServer::handleLastReceivedMessage(std::vector<Message*>::iterator las
         t_unknown unknown = cmd->getUnknown();
         std::cout << "UNKNOWN->" << unknown.error << std::endl;
     }
+    (*lastMsg)->setRead(true);
     delete(cmd);
 }
 
