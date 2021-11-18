@@ -19,9 +19,10 @@ void    IrcServer::nick(const t_nick &nick)
         if (!this->userExists(nick.nickName))
         {
             Client c = *(this->Server::getClients()->rbegin()->second);
-            IrcClient cl = IrcClient(c);
-            cl.setNickName(nick.nickName);
-            this->users.insert(std::pair<std::string, IrcClient*>(nick.nickName, &cl));
+            IrcClient *cl = new IrcClient(c);
+            cl->setNickName(nick.nickName);
+            this->users.insert(std::pair<std::string, IrcClient*>(nick.nickName, cl));
+       
         }
         else
             this->users[nick.nickName]->setNickName(nick.nickName);
@@ -30,7 +31,7 @@ void    IrcServer::nick(const t_nick &nick)
 
 void    IrcServer::user(const t_user &user)
 {
-    std::cout << user.hostName << std::endl; 
+    std::cout << "USER->" << user.hostName << std::endl; 
 }
 
 std::vector<Message*>::iterator   IrcServer::getLastUnreadMsg(void)
@@ -45,6 +46,7 @@ std::vector<Message*>::iterator   IrcServer::getLastUnreadMsg(void)
 void    IrcServer::handleLastReceivedMessage(std::vector<Message*>::iterator lastMsg )
 {
     std::string command = (*lastMsg)->getData();
+    std::cout << "LAST MSG->" << command << std::endl;
     CmdParser *cmd = new CmdParser(command);
     if (cmd->getType() == NICK)
     {
@@ -75,9 +77,13 @@ void    IrcServer::start(void)
     while (true)
     {
         this->runOnce();
-        std::vector<Message*>::iterator lastMsg = this->getLastUnreadMsg();
         if (this->getMessages()->size() > 0)
-            this->handleLastReceivedMessage(lastMsg);
+        {
+            std::vector<Message*>::iterator unreadMsg;
+            for (unreadMsg = this->getMessages()->begin(); unreadMsg != this->getMessages()->end(); unreadMsg++)
+                if (!((*unreadMsg)->hasItBeenRead()))
+                    this->handleLastReceivedMessage(unreadMsg);
+        }
     }
 }
 
