@@ -10,15 +10,18 @@
 # include <vector>
 # include <iostream>
 
-class IrcServer : public Server {
+class IrcServer {
 
     private:
+        Server *server;
         std::map<std::string, IrcClient*> *users;
 
     public:
         IrcServer(void);
         IrcServer(const char *port);
         ~IrcServer(void);
+
+        Server* getServer(void) const;
 
         void    start(void);
         

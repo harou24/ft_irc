@@ -1,10 +1,11 @@
 #include "irc_server.hpp"
 #include "ostream_irc_server.hpp"
+#include "../tcp_connection/tcp_connection.hpp"
 #include "../client/ostream_client.hpp"
 
-IrcServer::IrcServer(void) : Server(), users(new std::map<std::string, IrcClient*>()) { }
+IrcServer::IrcServer(void) : server(new Server()), users(new std::map<std::string, IrcClient*>()) { }
 
-IrcServer::IrcServer(const char *port) : Server(port), users(new std::map<std::string, IrcClient*>()) { }
+IrcServer::IrcServer(const char *port) : server(new Server(port)), users(new std::map<std::string, IrcClient*>()) { }
 
 IrcServer::~IrcServer(void) { }
 
@@ -26,12 +27,12 @@ bool IrcServer::isClientUser(const Client &cl) const
 
 void    IrcServer::nick(const t_nick &nick)
 {
-    if (this->Server::getNbConnectedClients() > 0)
+    if (server->getNbConnectedClients() > 0)
     {
-        Client c = *(this->Server::getClients()->rbegin()->second);
+        Client c = *(server->getClients()->rbegin()->second);
         if (!isClientUser(c))
         {
-            IrcClient *cl = &c;
+            IrcClient *cl = new IrcClient(c);
             cl->setNickName(nick.nickName);
             this->users->insert(std::pair<std::string, IrcClient*>(nick.nickName, cl));
         }
@@ -76,15 +77,15 @@ void    IrcServer::handleLastReceivedMessage(std::vector<Message*>::iterator las
 
 void    IrcServer::start(void)
 {
-    this->TcpConnection::init(TO_LISTEN);
+    server->TcpConnection::init(TcpConnection::TO_LISTEN);
     while (true)
     {
         std::cout << *this;
-        this->runOnce();
-        if (this->getMessages()->size() > 0)
+        server->runOnce();
+        if (server->getMessages()->size() > 0)
         {
             std::vector<Message*>::iterator unreadMsg;
-            for (unreadMsg = this->getMessages()->begin(); unreadMsg != this->getMessages()->end(); unreadMsg++)
+            for (unreadMsg = server->getMessages()->begin(); unreadMsg != server->getMessages()->end(); unreadMsg++)
                 if (!((*unreadMsg)->hasItBeenRead()))
                     this->handleLastReceivedMessage(unreadMsg);
         }
@@ -95,4 +96,6 @@ std::map<std::string, IrcClient*>* IrcServer::getUsers(void) const
 {
     return (this->users);
 }
+
+Server* IrcServer::getServer(void) const { return (this->server); }
 

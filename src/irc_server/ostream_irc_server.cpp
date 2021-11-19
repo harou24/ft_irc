@@ -14,8 +14,8 @@ std::ostream &operator << (std::ostream &output , const IrcServer &s)
 {
     output << "---------IRC-Server--------";
     putSpace(&output, 2);
-    output  << s.getLocalTime() << std::endl;
-    output << "NB_CONNECTED:      " << s.getNbConnectedClients() << std::endl;
+    output  << s.getServer()->getLocalTime() << std::endl;
+    output << "NB_CONNECTED:      " << s.getServer()->getNbConnectedClients() << std::endl;
     output << "NB_USERS:      " << s.getUsers()->size() << std::endl;
     output << "CONNECTED_CLIENTS: "  << std::endl;
     if (s.getUsers()->size() > 0)

@@ -25,7 +25,7 @@ class TcpConnection {
         TcpConnection(void);
         TcpConnection(const char *port);
         TcpConnection(const char *hostname, const char *port);
-        virtual ~TcpConnection(void);
+        ~TcpConnection(void);
 
         void            init(e_fdType type);
         
