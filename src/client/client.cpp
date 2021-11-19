@@ -1,6 +1,6 @@
 #include "client.hpp"
 #include "../tcp_connection/tcp_utils.hpp"
-#include "../tcp_connection/tcp_exceptions.hpp"
+#include "../tcp_connection/tcp_connection.hpp"
 
 #include <string.h>
 
@@ -10,7 +10,7 @@ Client::Client(const char *hostname, const char *port) : TcpConnection(hostname,
 
 Client::Client(const int fd) : connected(false), fd(fd) { }
 
-Client::Client(const Client &cl) : TcpConnection(hostname, port) 
+Client::Client(const Client &cl) : TcpConnection() 
 {
     this->connected = cl.connected;
     this->fd = cl.fd;
