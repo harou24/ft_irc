@@ -41,7 +41,6 @@ class Client : public TcpConnection {
         void                    setFd(const int newFd);
         void                    setData(const std::string &data);
         void                    setConnected(const bool status);
-
 };
 
 #endif

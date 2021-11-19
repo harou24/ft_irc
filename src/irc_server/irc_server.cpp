@@ -10,32 +10,34 @@ IrcServer::~IrcServer(void) { }
 
 bool    IrcServer::userExists(const std::string &nickName) const
 {
-    if (this->users->find(nickName) != this->users->end())
-    {
-        IrcClient *cl = this->users->find(nickName)->second;
-        if (cl->getUserName().empty())
-        {
-            return (false);
-        }
+    return(this->users->find(nickName) != this->users->end());
+}
+
+bool IrcServer::isClientUser(const Client &cl) const
+{
+    std::map<std::string, IrcClient*>::iterator it;
+    for (it = this->users->begin(); it != this->users->end(); it++)
+    {   std::cout << "FD->" << cl.getFd() << std::endl;
+        if (it->second->getFd() == cl.getFd())
+            return (true);
     }
-    return (true);
+    return (false);
 }
 
 void    IrcServer::nick(const t_nick &nick)
 {
     if (this->Server::getNbConnectedClients() > 0)
     {
-        if (!this->userExists(nick.nickName))
+        Client c = *(this->Server::getClients()->rbegin()->second);
+        if (!isClientUser(c))
         {
-            Client c = *(this->Server::getClients()->rbegin()->second);
-            IrcClient *cl = new IrcClient(c);
+            IrcClient *cl = &c;
             cl->setNickName(nick.nickName);
             this->users->insert(std::pair<std::string, IrcClient*>(nick.nickName, cl));
-       
         }
-        else
-            this->users->find(nick.nickName)->second->setNickName(nick.nickName);
     }
+    else
+        this->users->find(nick.nickName)->second->setNickName(nick.nickName);
 }
 
 void    IrcServer::user(const t_user &user)
