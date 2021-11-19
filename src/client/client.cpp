@@ -10,7 +10,7 @@ Client::Client(const char *hostname, const char *port) : TcpConnection(hostname,
 
 Client::Client(const int fd) : connected(false), fd(fd) { }
 
-Client::Client(const Client &cl)
+Client::Client(const Client &cl) : TcpConnection(hostname, port) 
 {
     this->connected = cl.connected;
     this->fd = cl.fd;
