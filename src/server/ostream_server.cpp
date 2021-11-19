@@ -19,7 +19,9 @@ std::ostream &operator << (std::ostream &output , const Server &s)
     if (s.getClients()->size() > 0)
     {
         putSpace(&output, 5);
-        output  << *(s.getClients()->at(5));
+        std::map<int, Client*>::iterator it;
+        for (it = s.getClients()->begin(); it != s.getClients()->end(); it++)
+            output  << *(it->second);
     }
     output << "\n";
 	return (output);
