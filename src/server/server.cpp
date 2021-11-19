@@ -132,7 +132,6 @@ bool    Server::isClientConnecting(int fd)
 
 void    Server::runOnce(void)
 {
-    std::cout << *this;
     try
     {
         this->updateFdsInSet();

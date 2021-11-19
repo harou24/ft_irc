@@ -13,7 +13,7 @@
 class IrcServer : public Server {
 
     private:
-        std::map<std::string, IrcClient*> users;
+        std::map<std::string, IrcClient*> *users;
 
     public:
         IrcServer(void);
@@ -29,7 +29,7 @@ class IrcServer : public Server {
 
         bool    userExists(const std::string &nickName) const;
 
-        std::map<std::string, IrcClient*>   getUsers(void) const;
+        std::map<std::string, IrcClient*>*   getUsers(void) const;
         std::vector<Message*>::iterator     getLastUnreadMsg(void);
 
         void        handleLastReceivedMessage(std::vector<Message*>::iterator lastMsg);

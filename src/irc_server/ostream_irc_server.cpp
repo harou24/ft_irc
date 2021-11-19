@@ -17,12 +17,12 @@ std::ostream &operator << (std::ostream &output , const IrcServer &s)
     output  << s.getLocalTime() << std::endl;
     output << "NB_CONNECTED:      " << s.getNbConnectedClients() << std::endl;
     output << "CONNECTED_CLIENTS: "  << std::endl;
-    if (s.getUsers().size() > 0)
+    if (s.getUsers()->size() > 0)
     {
         std::map<std::string, IrcClient*>::iterator it;
-        for (it = s.getUsers().begin(); it != s.getUsers().end(); it++)
+        for (it = s.getUsers()->begin(); it != s.getUsers()->end(); it++)
         {
-            std::cout << it->first << "->" << it->second << '\n';
+            std::cout << it->first << "->" << *(it->second) << '\n';
         }
     }
     output << "\n";
