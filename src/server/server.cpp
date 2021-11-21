@@ -1,61 +1,74 @@
 #include "server.hpp"
+#include "ostream_server.hpp"
+#include "../client/ostream_client.hpp"
 #include "../tcp_connection/tcp_utils.hpp"
 #include "../tcp_connection/tcp_exceptions.hpp"
-#include "../client/ostream_client.hpp"
+#include "../parser/parser.hpp"
 
 #include <unistd.h>
 #include <arpa/inet.h>
 
+#include <ctime>
+#include <time.h>
 
 #define WELCOME_MSG "------- Welcome to the server ! -------\n"
 
 
-Server::Server(void): TcpConnection("8080"), nbConnectedClients(0) { }
+Server::Server(void) :
+    TcpConnection("8080"),
+            nbConnectedClients(0), 
+                clients(new std::map<int, Client*>()),
+                    messages(new std::vector<Message*>())
+{ }
 
-Server::Server(const char *port): TcpConnection(port), nbConnectedClients(0) { }
+Server::Server(const char *port) :
+    TcpConnection(port),
+            nbConnectedClients(0),
+                clients(new std::map<int, Client*>()),
+                    messages(new std::vector<Message*>())
+{ }
 
 Server::~Server(void) { }
 
-void    Server::sendGreetingMsg(const Client &cl) const
+void    Server::sendGreetingMsg(const Client *cl) const
 {
-    this->sendDataToFd(cl.getFd(), WELCOME_MSG);
+    this->sendDataToFd(cl->getFd(), WELCOME_MSG);
 }
 
 void    Server::handleNewClient(void)
 {
-    Client cl;
+    Client *cl = new Client();
     try 
     {
-        this->acceptClientConnection(&cl);
+        this->acceptClientConnection(cl);
     }
     catch(TcpAcceptException &e)
     {
         std::cerr << e.what() << std::endl;
     }
     sendGreetingMsg(cl);
-    std::cout << cl;
-    this->clients.insert(std::pair<int, Client>(cl.getFd(), cl));
+    this->clients->insert(std::pair<int, Client*>(cl->getFd(), cl));
     this->nbConnectedClients++;
 }
 
-Client    Server::getClient(const int fd)
+Client*    Server::getClient(const int fd)
 {
-    std::map<int, Client>::iterator it;
-    it = this->clients.find(fd);
+    std::map<int, Client*>::iterator it;
+    it = this->clients->find(fd);
     return(it->second);
 }
 
-void    Server::removeClient(const Client &cl)
+void    Server::removeClient(const Client *cl)
 {
-        std::map<int, Client>::iterator it;
-        it = this->clients.find(cl.getFd());
-        this->clients.erase(it);
+        std::map<int, Client*>::iterator it;
+        it = this->clients->find(cl->getFd());
+        this->clients->erase(it);
 }
 
-void    Server::handleClientRemoval(const Client &cl)
+void    Server::handleClientRemoval(const Client *cl)
 {
-        close(cl.getFd());
-        removeFdFromSet(cl.getFd(), this->getMasterFds());
+        close(cl->getFd());
+        removeFdFromSet(cl->getFd(), this->getMasterFds());
         this->removeClient(cl);
 }
 
@@ -72,18 +85,28 @@ void    Server::handleClientData(const int fd)
         std::cerr << e.what() << std::endl;
     }
 
-    Client cl = this->getClient(fd);
+    Client *cl = this->getClient(fd);
     if (data.empty())
     {
-        cl.setConnected(false);
+        cl->setConnected(false);
+        this->nbConnectedClients--;
         this->handleClientRemoval(cl);
     }
     else
     {
-        this->receivedMessages.push_back(data);
-        cl.setData(data);
+        if (data.find("\n") != std::string::npos)
+        {
+            Parser p;
+            std::vector<std::string> msgs = p.split(data, '\n');
+            for (std::vector<std::string>::iterator cmd = msgs.begin(); cmd != msgs.end(); cmd++)
+            {
+                    this->messages->push_back(new Message(*cmd));
+            }
+        }
+        else
+            this->messages->push_back(new Message(data));
+        cl->setData(data);
     }
-    std::cout << cl;
 }
 
 std::string  Server::getClientIp(struct sockaddr_storage remoteAddr)
@@ -101,7 +124,6 @@ void    Server::acceptClientConnection(Client *cl)
     cl->setIp(this->getClientIp(remoteAddr));
     cl->setFd(fd);
     cl->setConnected(true);
-    std::cout << "New connection ...\n";
 }
 
 bool    Server::isClientConnecting(int fd)
@@ -139,4 +161,35 @@ void    Server::start(void)
     {
         this->runOnce();
     }
+}
+
+std::map<int, Client*>*   Server::getClients(void) const
+{
+    return (this->clients);
+}
+
+std::vector<Message*>*   Server::getMessages(void) const
+{
+    return (this->messages);
+}
+
+int                      Server::getNbConnectedClients(void) const
+{ 
+    return (this->nbConnectedClients);
+}
+
+std::string             Server::getLocalTime(void) const
+{
+    time_t rawtime;
+    struct tm * timeinfo;
+    time (&rawtime);
+    timeinfo = localtime (&rawtime);
+    return(std::string(asctime(timeinfo)));
+}
+
+void    Server::removeMsg(std::vector<Message*>::iterator toRemove)
+{
+    Message *msg = *toRemove;
+    this->messages->erase(toRemove);
+    delete(msg);
 }

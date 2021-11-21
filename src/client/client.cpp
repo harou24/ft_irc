@@ -1,6 +1,6 @@
 #include "client.hpp"
 #include "../tcp_connection/tcp_utils.hpp"
-#include "../tcp_connection/tcp_exceptions.hpp"
+#include "../tcp_connection/tcp_connection.hpp"
 
 #include <string.h>
 
@@ -8,10 +8,26 @@ Client::Client(void) : connected(false), fd(-1)  { }
 
 Client::Client(const char *hostname, const char *port) : TcpConnection(hostname, port) { }
 
-Client::Client(const int fd, const std::string &ip) : connected(false), fd(fd), ip(ip) { }
+Client::Client(const int fd) : connected(false), fd(fd) { }
+
+Client::Client(const Client &cl) : TcpConnection() 
+{
+    this->connected = cl.connected;
+    this->fd = cl.fd;
+    this->ip = cl.ip;
+    this->data = cl.data;
+}
 
 Client::~Client(void){ }
 
+Client& Client::operator = (const Client &cl)
+{
+    this->connected = cl.connected;
+    this->fd = cl.fd;
+    this->ip = cl.ip;
+    this->data = cl.data;
+    return (*this);
+}
 
 void            Client::sendMsg(const int fd, std::string &msg) { this->sendDataToFd(fd, msg); }
 

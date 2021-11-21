@@ -19,9 +19,12 @@ class Client : public TcpConnection {
 
     public:
         Client(void);
-        Client(const int fd, const std::string &ip);
+        Client(const int fd);
         Client(const char *hostname, const char *port);
-        ~Client(void);
+        Client(const Client &ct);
+        virtual ~Client(void);
+
+        Client& operator = (const Client &cl);
         
         void                    sendMsg(const int fd, std::string &msg);
         std::string             receiveMsg(const int fd);
@@ -38,7 +41,6 @@ class Client : public TcpConnection {
         void                    setFd(const int newFd);
         void                    setData(const std::string &data);
         void                    setConnected(const bool status);
-
 };
 
 #endif

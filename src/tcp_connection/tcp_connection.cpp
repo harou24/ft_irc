@@ -89,8 +89,14 @@ int    TcpConnection::applyFunctionToAddresses(t_ptrToFunction function, struct 
         }
         break;
     }
+    freeAddrInfo(addresses);
     if (tmpAddrInfo == NULL)
+    {
+        close(this->connectingFd);
+        close(this->listenerFd);
         throw TcpAssignAddrToFdException();
+
+    }
     return (fd);
 }
 
@@ -107,7 +113,6 @@ int            TcpConnection::getFd(e_fdType type, const char *hostname, const c
         std::cerr << e.what();
     }
     int  fd = this->findFd(type, addrInfo);
-    freeAddrInfo(addrInfo);
     return (fd);
 }
 
@@ -153,7 +158,7 @@ std::string TcpConnection::getDataFromFd(int fd)
     if ((nbytes = read(fd, buf, sizeof(buf))) <= 0)
     {
         if (nbytes == 0)
-            std::cout << "TCP Connection lost !\n";
+            std::cerr << "TCP Connection lost !\n";
         else
             std::cerr << "recv() error @_@\n";
     }

@@ -21,4 +21,14 @@ std::vector<std::string>    Parser::split(const std::string &str)
     return (tokens);
 }
 
+std::vector<std::string>    Parser::split(const std::string &str, const char c)
+{ 
+    std::vector<std::string> tokens;
+    std::stringstream streamStr(str);
+    std::string tmp;
+    while (getline(streamStr, tmp, c))
+        tokens.push_back(tmp);
+    return (tokens);
+}
+
 

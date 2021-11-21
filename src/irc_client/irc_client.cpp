@@ -9,9 +9,10 @@
 
 #define LOGIN_SIZE 20
 
-IrcClient::IrcClient(void) { }
+IrcClient::IrcClient(void) : Client() { }
 
-IrcClient::IrcClient(const char *hostName, const char *port) : Client(hostName, port)
+IrcClient::IrcClient(const char *hostName, const char *port) :
+    Client(hostName, port)
 {
     this->serverName = std::string(hostName);
     struct passwd *user = this->getUserInfo();
@@ -21,7 +22,11 @@ IrcClient::IrcClient(const char *hostName, const char *port) : Client(hostName, 
     this->realName = user->pw_gecos;
 }
 
-IrcClient::IrcClient(std::string &nickName, std::string &userName, std::string &hostName, std::string &serverName)
+IrcClient::IrcClient(std::string &nickName,
+                        std::string &userName,
+                            std::string &hostName,
+                                std::string &serverName) :
+    Client()
 {
     this->nickName = nickName;
     this->userName = userName;
@@ -29,7 +34,31 @@ IrcClient::IrcClient(std::string &nickName, std::string &userName, std::string &
     this->serverName = serverName;
 }
 
+IrcClient::IrcClient(const IrcClient &cl ) : Client(cl)
+{ 
+    this->nickName = cl.nickName;
+    this->userName = cl.userName;
+    this->hostName = cl.hostName;
+    this->serverName = cl.serverName;
+}
+
+IrcClient::IrcClient(const Client &cl ) : Client(cl) { }
+
 IrcClient::~IrcClient(void) { }
+
+IrcClient& IrcClient::operator = (const IrcClient &cl)
+{
+    this->setConnected(cl.isConnected());
+    this->setFd(cl.getFd());
+    this->setIp(cl.getIp());
+    this->setData(cl.getData());
+    this->nickName = cl.nickName;
+    this->userName = cl.userName;
+    this->hostName = cl.hostName;
+    this->serverName = cl.serverName;
+    this->realName = cl.realName;
+    return (*this);
+}
 
 struct passwd*  IrcClient::getUserInfo(void)
 {
@@ -44,7 +73,10 @@ void            IrcClient::connectToServer(void)
     this->init(TO_CONNECT);
     std::string nick("NICK " + this->nickName + "\n");
     this->sendMsg(this->getServerFd(), nick);
-    std::string user("USER " + this->nickName + " " + this->hostName + " " + this->serverName + " :" + this->realName + "\n");
+    std::string user("USER " + this->nickName + " "
+                                + this->hostName + " " 
+                                    + this->serverName 
+                                        + " :" + this->realName + "\n");
     this->sendMsg(this->getServerFd(), user);
 }
 
@@ -70,6 +102,37 @@ void            IrcClient::runCommunicationWithServer(void)
     }
 }
 
-void            IrcClient::setNickName(const std::string &nickName) { this->nickName = nickName; }
+void            IrcClient::setNickName(const std::string &nickName)
+{
+    this->nickName = nickName;
+}
+
+void            IrcClient::setUserName(const std::string &userName)
+{
+    this->userName = userName;
+}
+
+void            IrcClient::setHostName(const std::string &hostName)
+{
+    this->hostName = hostName;
+}
+
+void            IrcClient::setServerName(const std::string &serverName)
+{
+    this->serverName = serverName;
+}
+
+void            IrcClient::setRealName(const std::string &realName)
+{
+    this->realName = realName;
+}
 
 std::string     IrcClient::getNickName(void) const { return (this->nickName); }
+
+std::string     IrcClient::getUserName(void) const { return (this->userName); }
+
+std::string     IrcClient::getHostName(void) const { return (this->hostName); }
+
+std::string     IrcClient::getServerName(void) const { return (this->serverName); }
+
+std::string     IrcClient::getRealName(void) const { return (this->realName); }
