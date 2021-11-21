@@ -3,29 +3,48 @@
 
 #include <sstream>
 #include <map>
-
 static  void    putSpace(std::ostream *output, int nbSpaces)
 {
     for (int i = 0; i <= nbSpaces; i++)
         *output << " ";
 }
-
 std::ostream &operator << (std::ostream &output , const IrcServer &s)
 {
-    output << "---------IRC-Server--------";
-    putSpace(&output, 2);
-    output  << s.getServer()->getLocalTime() << std::endl;
-    output << "NB_CONNECTED:      " << s.getServer()->getNbConnectedClients() << std::endl;
-    output << "NB_USERS:      " << s.getUsers()->size() << std::endl;
-    output << "CONNECTED_CLIENTS: "  << std::endl;
+    output << "server:> "  << "\n";
+    
     if (s.getUsers()->size() > 0)
     {
+        output << "ls users\n";
+        putSpace(&output, 4);
+        output << "NICK NAME";
+        putSpace(&output, 4);
+        output << "USER NAME";
+        putSpace(&output, 4);
+        output << "HOST NAME";
+        putSpace(&output, 4);
+        output << "SERV NAME";
+        putSpace(&output, 4);
+        output << "REAL NAME";
+        putSpace(&output, 4);
+        output << " STATUS\n";
+        output << "    -------------------------------------------"; 
+        output << "-------------------------------------------\n";
         std::map<std::string, IrcClient*>::iterator it;
         for (it = s.getUsers()->begin(); it != s.getUsers()->end(); it++)
         {
-            std::cout << it->first << "->" << *(it->second) << '\n';
+            output << *(it->second) << '\n';
         }
     }
-    output << "\n";
+    if (s.getServer().getMessages()->size() > 0)
+    {
+        output << "\nMessages:\n";
+        std::vector<Message*>::iterator it;
+        for (it = s.getServer().getMessages()->begin(); it != s.getServer().getMessages()->end(); it++)
+        {
+            Message *msg =  *it;
+            output << msg->getData() << "\n";
+        }
+
+    }
 	return (output);
 }

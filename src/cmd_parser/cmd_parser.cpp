@@ -74,7 +74,7 @@ t_privMsg     CmdParser::getPrivMsg(void) const
 t_unknown  CmdParser::getUnknown(void) const
 {
     t_unknown unknown;
-    unknown.error = std::string("Error cmd does not exist : [ " + this->cmd + " ]");
+    unknown.error = std::string("Error cmd does not exist : | " + this->cmd + " |");
     return (unknown);
 }
 

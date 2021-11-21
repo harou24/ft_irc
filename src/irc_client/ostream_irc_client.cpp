@@ -7,52 +7,70 @@ static  void    putSpace(std::ostream *output, int nbSpaces)
         *output << " ";
 }
 
-std::ostream &operator << (std::ostream &output , const IrcClient &cl)
+static void     putStr(std::ostream *output, std::string str)
 {
-	output <<"IRC-Client {\n";
-    output << "NICK_NAME: " << cl.getNickName() << "\n";
-    output << "USER_NAME: " << cl.getUserName() << "\n";
-    output << "HOST_NAME: " << cl.getHostName() << "\n";
-    output << "SERVER_NAME: " << cl.getServerName() << "\n";
-    output << "REAL_NAME: " << cl.getRealName() << "\n";
-    if (cl.isConnected())
+    if (str.empty())
     {
-        putSpace(&output, 5);
-        output << "STATUS:";
-        putSpace(&output, 4);
-        output << GREEN << "connected" << RESET << std::endl;
+        *output << "N/A";
     }
     else
     {
-        putSpace(&output, 5);
-        output << "STATUS:";
-        putSpace(&output, 4);
-        output << RED << "disconnected" << RESET << std::endl;
+        *output << str ;
     }
-    putSpace(&output, 5);
-    output << "FD:";
-    putSpace(&output, 8);
-    output << cl.getFd() << std::endl;
-    putSpace(&output, 5);
-    output << "IP:";
-    putSpace(&output, 8);
-    output << cl.getIp() << std::endl;
-    if (!cl.getData().empty())
+}
+std::ostream &operator << (std::ostream &output , const IrcClient &cl)
+{
+    putSpace(&output, 4);
+    if (!cl.getNickName().empty())
     {
-        std::istringstream ss(cl.getData());
-        std::string del;
-        putSpace(&output, 5);
-        output << "DATA:";
-        putSpace(&output, 0);
-        getline(ss, del, '\n');
-        putSpace(&output, 5);
-        output << del << '\n';
-        while(getline(ss, del, '\n'))
-        {
-            putSpace(&output, 17);
-            output << del << '\n';
-        }
+        output << cl.getNickName();
+        putSpace(&output, 14 - cl.getNickName().size());
     }
-    output << "}" << std::endl;
-	return (output);
+    else
+    {
+        putStr(&output, "N/A");
+        putSpace(&output, 10);
+    }
+    if (!cl.getUserName().empty())
+    {
+        putStr(&output, cl.getUserName());
+        putSpace(&output, 14 - cl.getUserName().size());
+    }
+    else
+    {
+        putStr(&output, "N/A");
+        putSpace(&output, 10);
+    }
+    if (!cl.getHostName().empty())
+    {
+        putStr(&output, cl.getHostName());
+        putSpace(&output, 14 - cl.getHostName().size());
+    }
+    else
+    {
+        putStr(&output, "N/A");
+        putSpace(&output, 10);
+    }
+    if (!cl.getServerName().empty())
+    {
+        putStr(&output, cl.getServerName());
+        putSpace(&output, 14 -  cl.getServerName().size());
+    }
+    else
+    {
+        putStr(&output, "N/A");
+        putSpace(&output, 10);
+    }
+    if (!cl.getRealName().empty())
+    {
+        putStr(&output, cl.getRealName());
+        putSpace(&output, 14 - cl.getRealName().size());
+    }
+    else
+    {
+        putStr(&output, "N/A");
+        putSpace(&output, 7);
+    }
+
+    return (output);
 }

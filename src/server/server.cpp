@@ -99,7 +99,9 @@ void    Server::handleClientData(const int fd)
             Parser p;
             std::vector<std::string> msgs = p.split(data, '\n');
             for (std::vector<std::string>::iterator cmd = msgs.begin(); cmd != msgs.end(); cmd++)
-                this->messages->push_back(new Message(*cmd));
+            {
+                    this->messages->push_back(new Message(*cmd));
+            }
         }
         else
             this->messages->push_back(new Message(data));

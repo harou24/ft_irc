@@ -30,7 +30,10 @@ class IrcClient : public Client {
         void            connectToServer(void);
 
         void            setNickName(const std::string &nickName);
-        void            setUserName(const std::string &nickName);
+        void            setUserName(const std::string &userName);
+        void            setHostName(const std::string &hostName);
+        void            setServerName(const std::string &serverName);
+        void            setRealName(const std::string &realName);
 
         std::string     getNickName(void) const;
         std::string     getUserName(void) const;

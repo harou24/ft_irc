@@ -109,8 +109,24 @@ void            IrcClient::setNickName(const std::string &nickName)
 
 void            IrcClient::setUserName(const std::string &userName)
 {
-    this->nickName = userName;
+    this->userName = userName;
 }
+
+void            IrcClient::setHostName(const std::string &hostName)
+{
+    this->hostName = hostName;
+}
+
+void            IrcClient::setServerName(const std::string &serverName)
+{
+    this->serverName = serverName;
+}
+
+void            IrcClient::setRealName(const std::string &realName)
+{
+    this->realName = realName;
+}
+
 std::string     IrcClient::getNickName(void) const { return (this->nickName); }
 
 std::string     IrcClient::getUserName(void) const { return (this->userName); }
