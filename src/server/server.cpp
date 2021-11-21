@@ -124,7 +124,6 @@ void    Server::acceptClientConnection(Client *cl)
     cl->setIp(this->getClientIp(remoteAddr));
     cl->setFd(fd);
     cl->setConnected(true);
-    std::cout << "New connection ...\n";
 }
 
 bool    Server::isClientConnecting(int fd)

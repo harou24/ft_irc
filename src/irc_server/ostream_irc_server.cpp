@@ -3,11 +3,13 @@
 
 #include <sstream>
 #include <map>
+
 static  void    putSpace(std::ostream *output, int nbSpaces)
 {
     for (int i = 0; i <= nbSpaces; i++)
         *output << " ";
 }
+
 std::ostream &operator << (std::ostream &output , const IrcServer &s)
 {
     output << "server:> "  << "\n";
@@ -29,20 +31,28 @@ std::ostream &operator << (std::ostream &output , const IrcServer &s)
         output << " STATUS\n";
         output << "    -------------------------------------------"; 
         output << "-------------------------------------------\n";
-        std::map<std::string, IrcClient*>::iterator it;
-        for (it = s.getUsers()->begin(); it != s.getUsers()->end(); it++)
+        std::map<std::string, IrcClient*>::iterator itBegin;
+        std::map<std::string, IrcClient*>::iterator itEnd;
+        itBegin = s.getUsers()->begin();
+        itEnd = s.getUsers()->end();
+        while (itBegin != itEnd)
         {
-            output << *(it->second) << '\n';
+            output << *(itBegin->second) << '\n';
+            itBegin++;
         }
     }
     if (s.getServer().getMessages()->size() > 0)
     {
         output << "\nMessages:\n";
-        std::vector<Message*>::iterator it;
-        for (it = s.getServer().getMessages()->begin(); it != s.getServer().getMessages()->end(); it++)
+        std::vector<Message*>::iterator iBegin;
+        std::vector<Message*>::iterator iEnd;
+        iBegin  = s.getServer().getMessages()->begin();
+        iEnd = s.getServer().getMessages()->end();
+        while (iBegin != iEnd)
         {
-            Message *msg =  *it;
+            Message *msg =  *iBegin;
             output << msg->getData() << "\n";
+            iBegin++;
         }
 
     }

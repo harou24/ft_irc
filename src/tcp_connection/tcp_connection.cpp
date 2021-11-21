@@ -158,7 +158,7 @@ std::string TcpConnection::getDataFromFd(int fd)
     if ((nbytes = read(fd, buf, sizeof(buf))) <= 0)
     {
         if (nbytes == 0)
-            std::cout << "TCP Connection lost !\n";
+            std::cerr << "TCP Connection lost !\n";
         else
             std::cerr << "recv() error @_@\n";
     }
