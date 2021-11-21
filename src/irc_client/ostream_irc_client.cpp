@@ -18,6 +18,7 @@ static void     putStr(std::ostream *output, std::string str)
         *output << str ;
     }
 }
+
 std::ostream &operator << (std::ostream &output , const IrcClient &cl)
 {
     putSpace(&output, 4);
@@ -64,13 +65,18 @@ std::ostream &operator << (std::ostream &output , const IrcClient &cl)
     if (!cl.getRealName().empty())
     {
         putStr(&output, cl.getRealName());
-        putSpace(&output, 14 - cl.getRealName().size());
+        putSpace(&output, 5);
     }
     else
     {
         putStr(&output, "N/A");
         putSpace(&output, 7);
     }
+    if (cl.isConnected())
+    {
+        putStr(&output, "connected\n");
+    }
+        
 
     return (output);
 }
