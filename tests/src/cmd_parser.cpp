@@ -63,6 +63,22 @@ TEST_CASE("getPrivMsg()", "[CMD_PARSER]")
     REQUIRE(priv.msg == "this is the message !");
 }
 
+TEST_CASE("getPrivMsg() with new line", "[CMD_PARSER]")
+{
+    CmdParser cmd("PRIVMSG nickname :this is the message !\n");
+    t_privMsg priv = cmd.getPrivMsg();
+    REQUIRE(priv.nickName == "nickname");
+    REQUIRE(priv.msg == "this is the message !");
+}
+
+TEST_CASE("getPrivMsg() with spaces at the end", "[CMD_PARSER]")
+{
+    CmdParser cmd("PRIVMSG nickname :this is the message !                 ");
+    t_privMsg priv = cmd.getPrivMsg();
+    REQUIRE(priv.nickName == "nickname");
+    REQUIRE(priv.msg == "this is the message !");
+}
+
 TEST_CASE("getUnknown()", "[CMD_PARSER]")
 {
     CmdParser cmd("PRIVM :this is the message !");
@@ -70,3 +86,4 @@ TEST_CASE("getUnknown()", "[CMD_PARSER]")
     t_unknown unknown = cmd.getUnknown();
     REQUIRE(!unknown.error.empty());
 }
+

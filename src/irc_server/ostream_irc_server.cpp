@@ -30,7 +30,7 @@ std::ostream &operator << (std::ostream &output , const IrcServer &s)
         putSpace(&output, 4);
         output << " STATUS\n";
         output << "    -------------------------------------------"; 
-        output << "-------------------------------------------\n";
+        output << "-------------------------------------------" << std::endl;
         std::map<std::string, IrcClient*>::iterator itBegin;
         std::map<std::string, IrcClient*>::iterator itEnd;
         itBegin = s.getUsers()->begin();

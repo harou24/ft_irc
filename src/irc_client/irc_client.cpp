@@ -147,12 +147,12 @@ void            IrcClient::debug(void) const
         std::cerr << RED << "STATUS->" << GREEN << "connected" << RESET << std::endl;
     else
         std::cerr << RED << "STATUS->" << GREEN << "disconnected" << RESET << std::endl;
-    std::cerr << RED << "FD->" << GREEN << this->getFd() << RESET << std::endl;
-    std::cerr << RED << "IP->" << GREEN << this->getIp() << RESET << std::endl;
-    std::cerr << RED << "DATA_SENT->" << GREEN << this->getData() << RESET << std::endl;
-    std::cerr << RED << "NICKNAME->" << GREEN << this->nickName << RESET << std::endl;
-    std::cerr << RED << "USERNAME->" << GREEN << this->userName << RESET << std::endl;
-    std::cerr << RED << "HOSTNAME->" << GREEN << this->hostName << RESET << std::endl;
-    std::cerr << RED << "SERVERNAME->" << GREEN << this->serverName << RESET << std::endl;
-    std::cerr << RED << "REALNAME->" << GREEN << this->realName << RESET << std::endl;
+    std::cerr << RED << "FD->" << GREEN << "|" << this->getFd() << "|" << RESET << std::endl;
+    std::cerr << RED << "IP->" << GREEN << "|" << this->getIp() << "|" << RESET << std::endl;
+    std::cerr << RED << "DATA_SENT->" << GREEN << "|" << this->getData() << "|" << RESET << std::endl;
+    std::cerr << RED << "NICKNAME->" << GREEN << "|" << this->nickName << "|" << RESET << std::endl;
+    std::cerr << RED << "USERNAME->" << GREEN << "|" << this->userName << "|" << RESET << std::endl;
+    std::cerr << RED << "HOSTNAME->" << GREEN << "|" << this->hostName << "|" << RESET << std::endl;
+    std::cerr << RED << "SERVERNAME->" << GREEN << "|" << this->serverName << "|" << RESET << std::endl;
+    std::cerr << RED << "REALNAME->" << GREEN << "|" << this->realName << "|" << RESET << std::endl;
 }

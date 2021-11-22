@@ -102,7 +102,7 @@ void    Server::handleClientData(const int fd)
             std::vector<std::string> msgs = p.split(data, '\n');
             for (std::vector<std::string>::iterator cmd = msgs.begin(); cmd != msgs.end(); cmd++)
             {
-                    this->messages->push_back(new Message(*cmd));
+                this->messages->push_back(new Message(*cmd));
             }
         }
         else
@@ -127,7 +127,6 @@ void    Server::acceptClientConnection(Client *cl)
     int fd = this->acceptConnection(&remoteAddr);
     std::string ip = this->getClientIp(&remoteAddr);
     cl->setIp(ip);
-    cl->setIp(cl->getIp()); // without this it doesn't work
     cl->setFd(fd);
     cl->setConnected(true);
 }

@@ -30,6 +30,7 @@ std::vector<std::string>    CmdParser::split(const std::string &cmd)
         }
         else
         {
+            remove(tmp.begin(), tmp.end(), ' ');
             tokens.push_back(tmp);
         }
     }
@@ -52,24 +53,26 @@ t_nick     CmdParser::getNick(void) const
 {
     t_nick nick;
     nick.nickName = tokens[1];
+    std::remove(nick.nickName.begin(), nick.nickName.end(), '\n');
     return (nick);
 }
 
 t_user     CmdParser::getUser(void) const
 {
     t_user user;
-    user.userName = tokens[1];
-    user.hostName = tokens[2];
-    user.serverName = tokens[3];
-    user.realName = tokens[4];
+    user.userName = this->Parser::removeSpaces(tokens[1]);
+    user.hostName = this->Parser::removeSpaces(tokens[2]);
+    user.serverName = this->Parser::removeSpaces(tokens[3]);
+    user.realName = this->Parser::removeSpaces(tokens[4]);
+    std::remove(user.realName.begin(), user.realName.end(), '\n');
     return (user);
 }
 
 t_privMsg     CmdParser::getPrivMsg(void) const
 {
     t_privMsg privmsg;
-    privmsg.nickName = tokens[1];
-    privmsg.msg = tokens[2];
+    privmsg.nickName = this->Parser::removeSpaces(tokens[1]);
+    privmsg.msg = this->Parser::removeSpaces(tokens[2]);
     return (privmsg);
 }
 
@@ -88,14 +91,6 @@ void    CmdParser::debug(void) const
 {
     std::cerr << "CMD_PARSER_DEBUG:" << std::endl;
     std::cerr << RED << "TYPE->" << GREEN;
-    /*
-    switch(this->type)
-    {
-        case NICK: std::cerr << "NICK";
-        case USER: std::cerr << "USER";
-        case PRIVMSG: std::cerr << "PRIVMSG";
-        default: std::cerr << "UNKNOWN";
-    }*/
     if (this->type == NICK)
         std::cerr << "NICK";
     else if (this->type == USER)
@@ -107,5 +102,5 @@ void    CmdParser::debug(void) const
     std::cerr << RESET << std::endl;
     std::cerr << RED << "CMD->" << GREEN << this->cmd << RESET << std::endl;
     for (size_t i = 0; i < this->tokens.size(); i++)
-        std::cerr << RED << "tokens[" << i << "]->" << GREEN << this->tokens[i] << RESET << std::endl;
+        std::cerr << RED << "tokens[" << i << "]->" << GREEN << "|" << this->tokens[i] << "|" << RESET << std::endl;
 }
