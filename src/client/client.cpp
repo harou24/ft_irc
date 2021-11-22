@@ -1,14 +1,15 @@
 #include "client.hpp"
-#include "../tcp_connection/tcp_utils.hpp"
 #include "../tcp_connection/tcp_connection.hpp"
+#include "../tcp_connection/tcp_utils.hpp"
 
 #include <string.h>
 
-Client::Client(void) : connected(false), fd(-1)  { }
+Client::Client(void) : TcpConnection(), connected(false), fd(-1), ip("default"), data("default")  { }
 
-Client::Client(const char *hostname, const char *port) : TcpConnection(hostname, port) { }
+Client::Client(const char *hostname, const char *port)
+: TcpConnection(hostname, port), connected(false), fd(-1), ip("default"), data("default") { }
 
-Client::Client(const int fd) : connected(false), fd(fd) { }
+Client::Client(const int fd) : connected(false), fd(fd), ip("default"), data("default") { }
 
 Client::Client(const Client &cl) : TcpConnection() 
 {

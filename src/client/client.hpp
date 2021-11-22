@@ -6,7 +6,6 @@
 
 # include <iostream>
 
-
 # include "../tcp_connection/tcp_connection.hpp"
 
 class Client : public TcpConnection {
