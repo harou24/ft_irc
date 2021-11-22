@@ -21,7 +21,7 @@ class IrcServer {
         IrcServer(const char *port);
         ~IrcServer(void);
 
-        Server getServer(void) const;
+        const Server& getServer(void) const;
 
         void    start(void);
         
@@ -31,7 +31,6 @@ class IrcServer {
         void    unknown(const t_unknown &unknown);
 
         bool    userExists(const std::string &nickName) const;
-        bool    isClientUser(const Client &cl) const;
 
         std::map<std::string, IrcClient*>*   getUsers(void) const;
         std::vector<Message*>::iterator     getLastUnreadMsg(void);

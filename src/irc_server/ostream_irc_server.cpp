@@ -12,7 +12,7 @@ static  void    putSpace(std::ostream *output, int nbSpaces)
 
 std::ostream &operator << (std::ostream &output , const IrcServer &s)
 {
-    output << "server:> "  << "\n";
+    output << BOLD_BLUE << "server:> "  << RESET << "\n";
     
     if (s.getUsers()->size() > 0)
     {
@@ -37,6 +37,9 @@ std::ostream &operator << (std::ostream &output , const IrcServer &s)
         itEnd = s.getUsers()->end();
         while (itBegin != itEnd)
         {
+            std::cerr << "DEBUG JUST BEFORE TO PRINT USERS \n";
+            itBegin->second->debug();
+            std::cerr << "\n";
             output << *(itBegin->second) << '\n';
             itBegin++;
         }

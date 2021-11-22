@@ -13,7 +13,6 @@ class MockClient : public Client {
 
         void        connectToServer(void);
         void        runCommunicationWithServer(void);
-
 };
 
 #endif

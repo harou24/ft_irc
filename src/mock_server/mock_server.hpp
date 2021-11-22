@@ -9,7 +9,6 @@ class MockServer : public Server {
         ~MockServer(void);
 
         void    runUntilMsgFromClientReceived(void);
-
 };
 
 #endif

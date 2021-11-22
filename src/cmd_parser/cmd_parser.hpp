@@ -53,13 +53,15 @@ class CmdParser : public Parser {
 
         void        setType(void);
 
-        t_nick     getNick(void) const;
-        t_user     getUser(void) const;
-        t_privMsg  getPrivMsg(void) const;
+        t_nick      getNick(void) const;
+        t_user      getUser(void) const;
+        t_privMsg   getPrivMsg(void) const;
         t_unknown   getUnknown(void) const;
 
         std::vector<std::string>        getTokens(void);
         std::vector<std::string>        split(const std::string &cmd);
+        
+        void    debug(void) const;
 };
 
 #endif

@@ -38,7 +38,7 @@ class Server : public TcpConnection {
         bool            isClientConnecting(int fd);
         int             getNbConnectedClients(void) const;
         Client          *getClient(const int fd);
-        std::string     getClientIp(struct sockaddr_storage remoteAddr);
+        std::string     getClientIp(struct sockaddr_storage *remoteAddr);
         std::string     getLocalTime(void) const;
 
         std::map<int, Client*>* getClients(void) const;

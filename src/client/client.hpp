@@ -32,8 +32,8 @@ class Client : public TcpConnection {
         
         int                     getServerFd(void) const;
         int                     getFd(void) const;
-        std::string             getData(void) const;
-        std::string             getIp(void) const;
+        const std::string&      getData(void) const;
+        std::string      getIp(void) const;
         bool                    isConnected(void) const;
 
         void                    setIp(const std::string &newIp);

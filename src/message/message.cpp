@@ -1,6 +1,6 @@
 #include "message.hpp"
 
-Message::Message(void) : hasBeenRead(false) { }
+Message::Message(void) : data("default"), hasBeenRead(false) { }
 
 Message::Message(const std::string &data) : data(data), hasBeenRead(false) { }
 

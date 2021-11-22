@@ -1,9 +1,11 @@
 #include "cmd_parser.hpp"
+#include "../utils/colors.h"
+
 #include <sstream>
 
-CmdParser::CmdParser(void) { }
+CmdParser::CmdParser(void) : type(UNKNOWN), cmd("default") { }
 
-CmdParser::CmdParser(const std::string &cmd) : Parser()
+CmdParser::CmdParser(const std::string &cmd) : Parser(), type(UNKNOWN), cmd("default")
 {
     this->cmd = cmd;
     this->tokens = this->CmdParser::split(cmd);
@@ -81,3 +83,29 @@ t_unknown  CmdParser::getUnknown(void) const
 e_type      CmdParser::getType(void) const { return this->type; }
 
 std::vector<std::string> CmdParser::getTokens(void) { return (this->tokens); }
+
+void    CmdParser::debug(void) const
+{
+    std::cerr << "CMD_PARSER_DEBUG:" << std::endl;
+    std::cerr << RED << "TYPE->" << GREEN;
+    /*
+    switch(this->type)
+    {
+        case NICK: std::cerr << "NICK";
+        case USER: std::cerr << "USER";
+        case PRIVMSG: std::cerr << "PRIVMSG";
+        default: std::cerr << "UNKNOWN";
+    }*/
+    if (this->type == NICK)
+        std::cerr << "NICK";
+    else if (this->type == USER)
+        std::cerr << "USER";
+    else if (this->type == PRIVMSG)
+        std::cerr << "PRIVMSG";
+    else
+        std::cerr << "UNKNOWN";
+    std::cerr << RESET << std::endl;
+    std::cerr << RED << "CMD->" << GREEN << this->cmd << RESET << std::endl;
+    for (size_t i = 0; i < this->tokens.size(); i++)
+        std::cerr << RED << "tokens[" << i << "]->" << GREEN << this->tokens[i] << RESET << std::endl;
+}

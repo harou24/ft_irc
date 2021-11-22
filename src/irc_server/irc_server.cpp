@@ -1,28 +1,20 @@
 #include "irc_server.hpp"
 #include "ostream_irc_server.hpp"
-#include "../tcp_connection/tcp_connection.hpp"
 #include "../client/ostream_client.hpp"
-#include <stdio.h>
-IrcServer::IrcServer(void) : server(new Server()), users(new std::map<std::string, IrcClient*>()) { }
 
-IrcServer::IrcServer(const char *port) : server(new Server(port)), users(new std::map<std::string, IrcClient*>()) { }
+#include "../tcp_connection/tcp_connection.hpp"
+
+IrcServer::IrcServer(void)
+    : server(new Server()), users(new std::map<std::string, IrcClient*>()) { }
+
+IrcServer::IrcServer(const char *port)
+    : server(new Server(port)), users(new std::map<std::string, IrcClient*>()) { }
 
 IrcServer::~IrcServer(void) { }
 
 bool    IrcServer::userExists(const std::string &nickName) const
 {
     return(this->users->find(nickName) != this->users->end());
-}
-
-bool IrcServer::isClientUser(const Client &cl) const
-{
-    std::map<std::string, IrcClient*>::iterator it;
-    for (it = this->users->begin(); it != this->users->end(); it++)
-    {
-        if (it->second->getFd() == cl.getFd() && !it->second->getUserName().empty())
-            return (true);
-    }
-    return (false);
 }
 
 IrcClient*  IrcServer::getUserByFd(const int fd)
@@ -41,6 +33,7 @@ IrcClient*  IrcServer::getUserByFd(const int fd)
 void    IrcServer::nick(const t_nick &nick)
 {
         Client c = *(server->getClients()->rbegin()->second);
+        std::cerr  << c << std::endl;
         IrcClient *cl = getUserByFd(c.getFd());
         if (cl == NULL)
         {
@@ -52,6 +45,8 @@ void    IrcServer::nick(const t_nick &nick)
         {
             cl->setNickName(nick.nickName);
         }
+        std::cerr << "function nick() DEBUG:\n";
+        cl->debug();
 }
 
 void    IrcServer::user(const t_user &user)
@@ -64,36 +59,45 @@ void    IrcServer::user(const t_user &user)
         cl->setHostName(user.hostName);
         cl->setServerName(user.serverName);
         cl->setRealName(user.realName);
+        std::cerr << "function user() DEBUG:\n";
+        cl->debug();
     }
 }
 
 void    IrcServer::handleLastReceivedMessage(std::vector<Message*>::iterator lastMsg )
 {
     std::string command = (*lastMsg)->getData();
-    CmdParser *cmd = new CmdParser(command);
-    if (cmd->getType() == NICK)
+    std::cerr << RED << "CMD->" << GREEN << command << RESET << std::endl;
+    CmdParser cmd = CmdParser(command);
+    cmd.debug();
+    if (cmd.getType() == NICK)
     {
-        t_nick nick = cmd->getNick();
+        t_nick nick = cmd.getNick();
+        std::cerr << RED;
+        std::cerr << "NICK->" << GREEN << nick.nickName << RESET << std::endl;
         this->nick(nick);
     }
-    else if (cmd->getType() == USER)
+    else if (cmd.getType() == USER)
     {
-        t_user user = cmd->getUser();
+        t_user user = cmd.getUser();
+        std::cerr << RED << "USER->" << GREEN << user.userName << RESET << std::endl;
+        std::cerr << RED << "USER->" << GREEN << user.hostName << RESET << std::endl;
+        std::cerr << RED << "USER->" << GREEN << user.serverName << RESET << std::endl;
+        std::cerr << RED << "USER->" << GREEN << user.realName << RESET << std::endl;
         this->user(user);
     }
     
-    else if (cmd->getType() == PRIVMSG)
+    else if (cmd.getType() == PRIVMSG)
     {
-        t_privMsg privMsg = cmd->getPrivMsg();
+        t_privMsg privMsg = cmd.getPrivMsg();
         privMsg.msg = privMsg.msg ;
     }
     else
     {
-        t_unknown unknown = cmd->getUnknown();
+        t_unknown unknown = cmd.getUnknown();
         unknown.error = unknown.error;
     }
     (*lastMsg)->setRead(true);
-    delete(cmd);
 }
 
 void    IrcServer::start(void)
@@ -104,10 +108,14 @@ void    IrcServer::start(void)
         server->runOnce();
         if (server->getMessages()->size() > 0)
         {
-            std::vector<Message*>::iterator unreadMsg;
-            for (unreadMsg = server->getMessages()->begin(); unreadMsg != server->getMessages()->end(); unreadMsg++)
+            std::vector<Message*>::iterator unreadMsg = server->getMessages()->begin();
+            std::vector<Message*>::iterator msgEnd = server->getMessages()->end();
+            while (unreadMsg != msgEnd)
+            {
                 if (!((*unreadMsg)->hasItBeenRead()))
                     this->handleLastReceivedMessage(unreadMsg);
+                unreadMsg++;
+            }
         }
       std::cout << *this;
     }
@@ -118,5 +126,5 @@ std::map<std::string, IrcClient*>* IrcServer::getUsers(void) const
     return (this->users);
 }
 
-Server  IrcServer::getServer(void) const { return (*(this->server)); }
+const Server&  IrcServer::getServer(void) const { return (*(this->server)); }
 

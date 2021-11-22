@@ -11,6 +11,8 @@
 #include <ctime>
 #include <time.h>
 
+#include "errno.h"
+
 #define WELCOME_MSG "------- Welcome to the server ! -------\n"
 
 
@@ -109,11 +111,13 @@ void    Server::handleClientData(const int fd)
     }
 }
 
-std::string  Server::getClientIp(struct sockaddr_storage remoteAddr)
+std::string  Server::getClientIp(struct sockaddr_storage *remoteAddr)
 {
     char    remoteIp[INET6_ADDRSTRLEN];
-    inet_ntop(remoteAddr.ss_family, getInAddr((struct sockaddr*)&remoteAddr), remoteIp, INET6_ADDRSTRLEN);
-    std::string ip(remoteIp);
+    const char *ipp = inet_ntop(remoteAddr->ss_family, getInAddr((struct sockaddr*)remoteAddr), remoteIp, INET6_ADDRSTRLEN);
+    if (!ipp)
+        strerror(errno);
+    std::string ip(ipp);
     return (ip);
 }
 
@@ -121,7 +125,9 @@ void    Server::acceptClientConnection(Client *cl)
 {
     struct sockaddr_storage remoteAddr;
     int fd = this->acceptConnection(&remoteAddr);
-    cl->setIp(this->getClientIp(remoteAddr));
+    std::string ip = this->getClientIp(&remoteAddr);
+    cl->setIp(ip);
+    cl->setIp(cl->getIp()); // without this it doesn't work
     cl->setFd(fd);
     cl->setConnected(true);
 }

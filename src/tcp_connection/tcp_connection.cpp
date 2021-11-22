@@ -1,6 +1,6 @@
 #include "tcp_connection.hpp"
-#include "tcp_utils.hpp"
 #include "tcp_exceptions.hpp"
+#include "tcp_utils.hpp"
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -95,7 +95,6 @@ int    TcpConnection::applyFunctionToAddresses(t_ptrToFunction function, struct 
         close(this->connectingFd);
         close(this->listenerFd);
         throw TcpAssignAddrToFdException();
-
     }
     return (fd);
 }

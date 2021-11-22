@@ -11,7 +11,7 @@ Client::Client(const char *hostname, const char *port)
 
 Client::Client(const int fd) : connected(false), fd(fd), ip("default"), data("default") { }
 
-Client::Client(const Client &cl) : TcpConnection() 
+Client::Client(const Client &cl) 
 {
     this->connected = cl.connected;
     this->fd = cl.fd;
@@ -43,9 +43,9 @@ int             Client::getServerFd(void) const { return (this->getConnectingFd(
 
 int             Client::getFd(void) const { return (this->fd); }
 
-std::string     Client::getIp(void) const { return (this->ip); }
+std::string    Client::getIp(void) const { return (this->ip); }
 
-std::string     Client::getData(void) const { return (this->data); }
+const std::string&     Client::getData(void) const { return (this->data); }
 
 bool            Client::isConnected(void) const { return (this->connected); }
 
@@ -54,7 +54,7 @@ void            Client::setData(const std::string &data) { this->data.assign(dat
 
 void            Client::setConnected(const bool status) { this->connected = status; }
 
-void            Client::setIp(const std::string &newIp) { this->ip = newIp; }
+void            Client::setIp(const std::string &newIp) { this->ip.assign(newIp); }
 
 void            Client::setFd(const int newFd) { this->fd = newFd; }
 
