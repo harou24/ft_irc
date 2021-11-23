@@ -1,45 +1,38 @@
 #include "ostream_irc_server.hpp"
+#include "../utils/output_utils.hpp"
 #include "../irc_client/ostream_irc_client.hpp"
 
 #include <sstream>
 #include <map>
 
-static  void    putSpace(std::ostream *output, int nbSpaces)
-{
-    for (int i = 0; i <= nbSpaces; i++)
-        *output << " ";
-}
-
 std::ostream &operator << (std::ostream &output , const IrcServer &s)
 {
-    output << BOLD_BLUE << "server:> "  << RESET << "\n";
     
     if (s.getUsers()->size() > 0)
     {
-        output << "ls users\n";
-        putSpace(&output, 4);
+        output << BLUB  << s.getServer().getLocalTime().substr(0, 5) << "-server :>"  << RESET;
+        output << " ls users\n\n";
+        putChar(output, ' ', 5);
         output << "NICK NAME";
-        putSpace(&output, 4);
+        putChar(output, ' ', 5);
         output << "USER NAME";
-        putSpace(&output, 4);
+        putChar(output, ' ', 5);
         output << "HOST NAME";
-        putSpace(&output, 4);
+        putChar(output, ' ', 5);
         output << "SERV NAME";
-        putSpace(&output, 4);
+        putChar(output, ' ', 7);
         output << "REAL NAME";
-        putSpace(&output, 4);
+        putChar(output, ' ', 14);
         output << " STATUS\n";
-        output << "    -------------------------------------------"; 
-        output << "-------------------------------------------" << std::endl;
+        putChar(output, ' ', 5);
+        putChar(output, '-', 91);
+        putChar(output, '\n', 1);
         std::map<std::string, IrcClient*>::iterator itBegin;
         std::map<std::string, IrcClient*>::iterator itEnd;
         itBegin = s.getUsers()->begin();
         itEnd = s.getUsers()->end();
         while (itBegin != itEnd)
         {
-            std::cerr << "DEBUG JUST BEFORE TO PRINT USERS \n";
-            itBegin->second->debug();
-            std::cerr << "\n";
             output << *(itBegin->second) << '\n';
             itBegin++;
         }

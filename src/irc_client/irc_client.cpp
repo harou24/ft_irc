@@ -142,11 +142,11 @@ std::string     IrcClient::getRealName(void) const { return (this->realName); }
 
 void            IrcClient::debug(void) const
 {
-    std::cerr << "IRC_CLIENT_DEBUG:" << std::endl;
+    std::cerr << "::IRC_CLIENT_DEBUG::" << std::endl;
     if (this->isConnected())
-        std::cerr << RED << "STATUS->" << GREEN << "connected" << RESET << std::endl;
+        std::cerr << RED << "STATUS->" << GREEN << "|connected|" << RESET << std::endl;
     else
-        std::cerr << RED << "STATUS->" << GREEN << "disconnected" << RESET << std::endl;
+        std::cerr << RED << "STATUS->" << RED << "|disconnected|" << RESET << std::endl;
     std::cerr << RED << "FD->" << GREEN << "|" << this->getFd() << "|" << RESET << std::endl;
     std::cerr << RED << "IP->" << GREEN << "|" << this->getIp() << "|" << RESET << std::endl;
     std::cerr << RED << "DATA_SENT->" << GREEN << "|" << this->getData() << "|" << RESET << std::endl;

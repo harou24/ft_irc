@@ -189,7 +189,10 @@ std::string             Server::getLocalTime(void) const
     struct tm * timeinfo;
     time (&rawtime);
     timeinfo = localtime (&rawtime);
-    return(std::string(asctime(timeinfo)));
+    std::string localTime(asctime(timeinfo));
+    Parser p;
+    std::vector<std::string> hour = p.split(localTime);
+    return (hour[3]);
 }
 
 void    Server::removeMsg(std::vector<Message*>::iterator toRemove)

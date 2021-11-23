@@ -33,7 +33,6 @@ IrcClient*  IrcServer::getUserByFd(const int fd)
 void    IrcServer::nick(const t_nick &nick)
 {
         Client c = *(server->getClients()->rbegin()->second);
-        std::cerr  << c << std::endl;
         IrcClient *cl = getUserByFd(c.getFd());
         if (cl == NULL)
         {
@@ -45,8 +44,6 @@ void    IrcServer::nick(const t_nick &nick)
         {
             cl->setNickName(nick.nickName);
         }
-        std::cerr << "function nick() DEBUG:\n";
-        cl->debug();
 }
 
 void    IrcServer::user(const t_user &user)
@@ -59,31 +56,22 @@ void    IrcServer::user(const t_user &user)
         cl->setHostName(user.hostName);
         cl->setServerName(user.serverName);
         cl->setRealName(user.realName);
-        std::cerr << "function user() DEBUG:\n";
-        cl->debug();
     }
 }
 
 void    IrcServer::handleLastReceivedMessage(std::vector<Message*>::iterator lastMsg )
 {
     std::string command = (*lastMsg)->getData();
-    std::cerr << RED << "CMD->" << GREEN << "|" << command << "|" << RESET << std::endl;
     CmdParser cmd = CmdParser(command);
-    cmd.debug();
+    //cmd.debug();
     if (cmd.getType() == NICK)
     {
         t_nick nick = cmd.getNick();
-        std::cerr << RED;
-        std::cerr << "NICK->" << GREEN << "|" << nick.nickName << "|" << RESET << std::endl;
         this->nick(nick);
     }
     else if (cmd.getType() == USER)
     {
         t_user user = cmd.getUser();
-        std::cerr << RED << "USER->|" << GREEN << user.userName << RED << "|" << RESET << std::endl;
-        std::cerr << RED << "USER->|" << GREEN << user.hostName << RED << "|" << RESET << std::endl;
-        std::cerr << RED << "USER->|" << GREEN << user.serverName << RED << "|" << RESET << std::endl;
-        std::cerr << RED << "USER->|" << GREEN << user.realName << RED << "|" << RESET << std::endl;
         this->user(user);
     }
     

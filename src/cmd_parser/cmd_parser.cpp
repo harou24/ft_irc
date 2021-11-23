@@ -89,18 +89,18 @@ std::vector<std::string> CmdParser::getTokens(void) { return (this->tokens); }
 
 void    CmdParser::debug(void) const
 {
-    std::cerr << "CMD_PARSER_DEBUG:" << std::endl;
+    std::cerr << "::CMD_PARSER_DEBUG::" << std::endl;
     std::cerr << RED << "TYPE->" << GREEN;
     if (this->type == NICK)
-        std::cerr << "NICK";
+        std::cerr << "|NICK|";
     else if (this->type == USER)
-        std::cerr << "USER";
+        std::cerr << "|USER|";
     else if (this->type == PRIVMSG)
-        std::cerr << "PRIVMSG";
+        std::cerr << "|PRIVMSG|";
     else
-        std::cerr << "UNKNOWN";
+        std::cerr << "|UNKNOWN|";
     std::cerr << RESET << std::endl;
-    std::cerr << RED << "CMD->" << GREEN << this->cmd << RESET << std::endl;
+    std::cerr << RED << "CMD->" << GREEN << "|" << this->cmd << "|" << RESET << std::endl;
     for (size_t i = 0; i < this->tokens.size(); i++)
         std::cerr << RED << "tokens[" << i << "]->" << GREEN << "|" << this->tokens[i] << "|" << RESET << std::endl;
 }
