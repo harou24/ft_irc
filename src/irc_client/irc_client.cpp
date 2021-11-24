@@ -83,16 +83,27 @@ void            IrcClient::connectToServer(void)
     this->sendMsg(this->getServerFd(), user);
 }
 
+std::string* IrcClient::getReceivedMsg(void)
+{
+    std::string data = receiveMsg(this->getServerFd());
+    if (data.empty())
+        return (NULL);
+    return (new std::string(data));
+}
+
 void            IrcClient::runCommunicationWithServer(void)
 {
     while (true)
     {
-        std::string data = receiveMsg(this->getServerFd());
-        if (!data.empty())
-            std::cout << data << std::endl;
         std::cout << GREEN << this->nickName << ":> " << RESET;
         for (std::string line; std::getline(std::cin, line);)
         {
+            if (this->TcpConnection::isFdReadyForCommunication(this->getServerFd()))
+            {
+                std::string *data = getReceivedMsg();
+                if (data)
+                    std::cout << data << std::endl;
+            }
             if (line == "/quit")
             {
                 close(this->getServerFd());

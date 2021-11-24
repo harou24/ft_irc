@@ -44,6 +44,7 @@ class IrcClient : public Client {
         struct passwd    *getUserInfo(void);
 
         void    debug(void) const;
+        std::string* getReceivedMsg(void);
 };
 
 #endif

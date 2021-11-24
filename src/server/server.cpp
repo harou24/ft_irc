@@ -37,6 +37,11 @@ void    Server::sendGreetingMsg(const Client *cl) const
     this->sendDataToFd(cl->getFd(), WELCOME_MSG);
 }
 
+void    Server::sendMsg(const int fd, const std::string &msg) const
+{
+    this->sendDataToFd(fd, msg);
+}
+
 void    Server::handleNewClient(void)
 {
     Client *cl = new Client();
@@ -88,7 +93,7 @@ void    Server::handleClientData(const int fd)
     }
 
     Client *cl = this->getClient(fd);
-    if (data.empty())
+    if (!cl || data.empty())
     {
         cl->setConnected(false);
         this->nbConnectedClients--;

@@ -9,6 +9,8 @@
 #include <stdio.h>
 #include <netdb.h>
 
+#include <errno.h>
+
 #define MAX_PENDING_CONNECTION 10
 #define MAX_BUFF_SIZE 256
 
@@ -159,7 +161,11 @@ std::string TcpConnection::getDataFromFd(int fd)
         if (nbytes == 0)
             std::cerr << "TCP Connection lost !\n";
         else
+        {
             std::cerr << "recv() error @_@\n";
+            std::cerr << strerror(errno) << std::endl;
+            return ("");
+        }
     }
     buf[nbytes] = '\0';
     std::string data(buf);

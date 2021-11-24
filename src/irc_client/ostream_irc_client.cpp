@@ -18,8 +18,17 @@ std::ostream &operator << (std::ostream &output , const IrcClient &cl)
     putChar(output, ' ', 7);
     output << cl.getRealName();
     putChar(output, ' ', 4);
-    output << GREEN;
-    output << "connected";
-    output << RESET;
+    if (cl.isConnected())
+    {
+        output << GREEN;
+        output << "connected";
+        output << RESET;
+    }
+    else
+    {
+        output << RED;
+        output << "disconnected";
+        output << RESET;
+    }
     return (output);
 }

@@ -26,6 +26,8 @@ class Server : public TcpConnection {
         void    runOnce(void);
         void    start(void);
 
+        void    sendMsg(const int fd, const std::string &msg) const;
+
         void    handleNewClient(void);
         void    handleClientData(const int fd);
         void    handleClientRemoval(const Client *cl);

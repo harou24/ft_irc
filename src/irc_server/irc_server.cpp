@@ -19,7 +19,6 @@ bool    IrcServer::userExists(const std::string &nickName) const
 
 IrcClient*  IrcServer::getUserByFd(const int fd)
 {
-
     IrcClient *usr = NULL;
     std::map<std::string, IrcClient*>::iterator it;
     for (it = this->users->begin(); it != this->users->end(); it++)
@@ -32,16 +31,24 @@ IrcClient*  IrcServer::getUserByFd(const int fd)
 
 void    IrcServer::nick(const t_nick &nick)
 {
-        Client c = *(server->getClients()->rbegin()->second);
-        IrcClient *cl = getUserByFd(c.getFd());
+        Client *c = server->getClients()->rbegin()->second;
+        if (!c)
+        {
+
+            return;
+        }
+        IrcClient *cl = getUserByFd(c->getFd());
         if (cl == NULL)
         {
-            cl = new IrcClient(c);
+            cl = new IrcClient(*c);
             cl->setNickName(nick.nickName);
             this->users->insert(std::pair<std::string, IrcClient*>(nick.nickName, cl));
         }
         else
         {
+            std::string reply = ":" + cl->getNickName() + " NICK " + nick.nickName + "\n";
+            std::cerr << "sending msg to client : " << reply << std::endl;
+            this->server->sendMsg(cl->getFd(), reply);
             cl->setNickName(nick.nickName);
         }
 }
@@ -63,7 +70,7 @@ void    IrcServer::handleLastReceivedMessage(std::vector<Message*>::iterator las
 {
     std::string command = (*lastMsg)->getData();
     CmdParser cmd = CmdParser(command);
-    //cmd.debug();
+    cmd.debug();
     if (cmd.getType() == NICK)
     {
         t_nick nick = cmd.getNick();
