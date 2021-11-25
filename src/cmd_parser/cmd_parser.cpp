@@ -2,6 +2,7 @@
 #include "../utils/colors.h"
 
 #include <sstream>
+#include <cstdio>
 
 CmdParser::CmdParser(void) : type(UNKNOWN), cmd("default") { }
 
