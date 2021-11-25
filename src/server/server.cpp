@@ -11,7 +11,8 @@
 #include <ctime>
 #include <time.h>
 
-#include "errno.h"
+#include <errno.h>
+#include <string.h>
 
 #define WELCOME_MSG "------- Welcome to the server ! -------\n"
 
