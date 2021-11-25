@@ -11,7 +11,7 @@ Client::Client(const char *hostname, const char *port)
 
 Client::Client(const int fd) : connected(false), fd(fd), ip("default"), data("default") { }
 
-Client::Client(const Client &cl) 
+Client::Client(const Client &cl) : TcpConnection()
 {
     this->connected = cl.connected;
     this->fd = cl.fd;
