@@ -10,6 +10,7 @@
 #include <netdb.h>
 
 #include <errno.h>
+#include "../utils/colors.h"
 
 #define MAX_PENDING_CONNECTION 10
 #define MAX_BUFF_SIZE 256
@@ -163,7 +164,7 @@ std::string TcpConnection::getDataFromFd(int fd)
     if ((nbytes = read(fd, buf, sizeof(buf))) <= 0)
     {
         if (nbytes == 0)
-            std::cerr << "TCP Connection lost !\n";
+            std::cout << BG_RED << "TCP Connection lost ! " << RESET << "\n";
         else
         {
             std::cerr << "recv() error @_@\n";

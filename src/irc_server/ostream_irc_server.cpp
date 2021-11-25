@@ -39,7 +39,12 @@ std::ostream &operator << (std::ostream &output , const IrcServer &s)
     }
     if (s.getServer().getMessages()->size() > 0)
     {
-        output << "\nMessages:\n";
+        output << "\n\n";
+        putChar(output, ' ', 5);
+        output << "MESSAGES\n";
+        putChar(output, ' ', 5);
+        putChar(output, '-', 91);
+        putChar(output, '\n', 1);
         std::vector<Message*>::iterator iBegin;
         std::vector<Message*>::iterator iEnd;
         iBegin  = s.getServer().getMessages()->begin();
@@ -47,10 +52,11 @@ std::ostream &operator << (std::ostream &output , const IrcServer &s)
         while (iBegin != iEnd)
         {
             Message *msg =  *iBegin;
+            putChar(output, ' ', 5);
             output << msg->getData() << "\n";
             iBegin++;
         }
-
+        output << std::endl;
     }
 	return (output);
 }

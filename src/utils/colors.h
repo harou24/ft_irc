@@ -17,7 +17,7 @@
 # define U_WHITE "\e[4;37m"
 //Regular background
 # define BLKB "\e[40m"
-# define REDB "\e[41m"
+# define BG_RED "\e[41m"
 # define GRNB "\e[42m"
 # define YELB "\e[43m"
 # define BLUB "\e[44m"

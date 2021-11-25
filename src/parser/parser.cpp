@@ -37,7 +37,7 @@ std::vector<std::string>    Parser::split(const std::string &str, const char c)
 std::string Parser::removeSpaces(const std::string &s) const
 {
   int last = s.size() - 1;
-  while (last >= 0 && s[last] == '\r')
+  while (last >= 0 && (s[last] == '\r' || s[last] == ' ' || s[last] == '\n'))
     --last;
   return s.substr(0, last + 1);
 }

@@ -34,8 +34,7 @@ void    IrcServer::nick(const t_nick &nick)
         Client *c = server->getClients()->rbegin()->second;
         if (!c)
         {
-
-            return;
+            return ;
         }
         IrcClient *cl = getUserByFd(c->getFd());
         if (cl == NULL)
@@ -85,7 +84,7 @@ void    IrcServer::handleLastReceivedMessage(std::vector<Message*>::iterator las
     else if (cmd.getType() == PRIVMSG)
     {
         t_privMsg privMsg = cmd.getPrivMsg();
-        privMsg.msg = privMsg.msg ;
+        privMsg.msg = privMsg.msg;
     }
     else
     {
@@ -95,24 +94,42 @@ void    IrcServer::handleLastReceivedMessage(std::vector<Message*>::iterator las
     (*lastMsg)->setRead(true);
 }
 
+void    IrcServer::updateUsersStatus(void)
+{
+    std::map<std::string, IrcClient*>::iterator it;
+    for (it = this->users->begin(); it != this->users->end(); it++)
+        if (this->server->getClients()->find(it->second->getFd()) ==
+                                        this->server->getClients()->end())
+        {
+            it->second->setConnected(false);
+            std::cout << "Connection lost with -> " << RED << it->second->getNickName() << RESET << "\n\n";
+        }
+}
+
+void    IrcServer::handleUnreadMessages(void)
+{
+    if (server->getMessages()->size() > 0)
+    {
+        std::vector<Message*>::iterator unreadMsg = server->getMessages()->begin();
+        std::vector<Message*>::iterator msgEnd = server->getMessages()->end();
+        while (unreadMsg != msgEnd)
+        {
+            if (!((*unreadMsg)->hasItBeenRead()))
+                this->handleLastReceivedMessage(unreadMsg);
+            unreadMsg++;
+        }
+    }
+}
+
 void    IrcServer::start(void)
 {
-    server->TcpConnection::init(TcpConnection::TO_LISTEN);
+    this->server->TcpConnection::init(TcpConnection::TO_LISTEN);
     while (true)
     {
-        server->runOnce();
-        if (server->getMessages()->size() > 0)
-        {
-            std::vector<Message*>::iterator unreadMsg = server->getMessages()->begin();
-            std::vector<Message*>::iterator msgEnd = server->getMessages()->end();
-            while (unreadMsg != msgEnd)
-            {
-                if (!((*unreadMsg)->hasItBeenRead()))
-                    this->handleLastReceivedMessage(unreadMsg);
-                unreadMsg++;
-            }
-        }
-      std::cerr << *this;
+        this->server->runOnce();
+        this->updateUsersStatus();
+        this->handleUnreadMessages();
+        std::cerr << *this;
     }
 }
 

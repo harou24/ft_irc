@@ -6,7 +6,10 @@
 std::ostream &operator << (std::ostream &output , const IrcClient &cl)
 {
     putChar(output, ' ', 5);
-    output << GREEN;
+    if (cl.isConnected())
+        output << GREEN;
+    else
+        output << RED;
     output<< cl.getNickName();
     output << RESET;
     putChar(output, ' ', 6); 

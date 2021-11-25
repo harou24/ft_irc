@@ -11,31 +11,30 @@
 # include <iostream>
 
 class IrcServer {
-
     private:
         Server *server;
         std::map<std::string, IrcClient*> *users;
-
     public:
         IrcServer(void);
         IrcServer(const char *port);
         ~IrcServer(void);
 
-        const Server& getServer(void) const;
-
         void    start(void);
+        void    updateUsersStatus(void);
+        void    handleUnreadMessages(void);
+        bool    userExists(const std::string &nickName) const;
+        void    handleLastReceivedMessage(std::vector<Message*>::iterator lastMsg);
         
         void    nick(const t_nick &nick);
         void    privMsg(const t_privMsg &privMsg);
         void    user(const t_user &user);
         void    unknown(const t_unknown &unknown);
-
-        bool    userExists(const std::string &nickName) const;
+        
+        const Server&   getServer(void) const;
+        IrcClient*      getUserByFd(const int fd);
 
         std::map<std::string, IrcClient*>*   getUsers(void) const;
         std::vector<Message*>::iterator     getLastUnreadMsg(void);
-        IrcClient*  getUserByFd(const int fd);
-        void        handleLastReceivedMessage(std::vector<Message*>::iterator lastMsg);
 };
 
 #endif
