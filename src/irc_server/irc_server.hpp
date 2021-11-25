@@ -33,7 +33,7 @@ class IrcServer {
         const Server&   getServer(void) const;
         IrcClient*      getUserByFd(const int fd);
 
-        std::map<std::string, IrcClient*>*   getUsers(void) const;
+        std::map<std::string, IrcClient*>*  getUsers(void) const;
         std::vector<Message*>::iterator     getLastUnreadMsg(void);
 };
 

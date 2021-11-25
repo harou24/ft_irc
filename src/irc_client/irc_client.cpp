@@ -25,16 +25,18 @@ IrcClient::IrcClient(const char *hostName, const char *port) :
     this->realName = user->pw_gecos;
 }
 
-IrcClient::IrcClient(std::string &nickName,
-                        std::string &userName,
-                            std::string &hostName,
-                                std::string &serverName) :
-    Client()
+IrcClient::IrcClient(const std::string &nickName,
+                        const std::string &userName,
+                            const std::string &hostName,
+                                const std::string &serverName,
+                                    const std::string &realName)
+    : Client()
 {
     this->nickName = nickName;
     this->userName = userName;
     this->hostName = hostName;
     this->serverName = serverName;
+    this->realName = realName;
 }
 
 IrcClient::IrcClient(const IrcClient &cl ) : Client(cl)

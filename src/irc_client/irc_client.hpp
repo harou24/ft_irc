@@ -17,10 +17,11 @@ class IrcClient : public Client {
         IrcClient(void);
         IrcClient(const std::string &nickName);
         IrcClient(const char *hostName, const char *port);
-        IrcClient(std::string &nickName,
-                    std::string &userName,
-                        std::string &hostName,
-                            std::string &serverName);
+        IrcClient(const std::string &nickName,
+                    const std::string &userName,
+                        const std::string &hostName,
+                            const std::string &serverName,
+                                const std::string &realName);
         IrcClient(const IrcClient &cl);
         IrcClient(const Client &cl);
         ~IrcClient(void);
