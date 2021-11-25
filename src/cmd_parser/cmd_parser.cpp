@@ -31,7 +31,7 @@ std::vector<std::string>    CmdParser::split(const std::string &cmd)
         }
         else
         {
-            remove(tmp.begin(), tmp.end(), ' ');
+            std::remove(tmp.begin(), tmp.end(), ' ');
             tokens.push_back(tmp);
         }
     }
