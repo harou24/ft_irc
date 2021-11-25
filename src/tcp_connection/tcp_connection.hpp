@@ -34,6 +34,7 @@ class TcpConnection {
         int             assignAddrToListenerFd(int sockFd, const struct sockaddr *addr, socklen_t addrlen);
 
         std::string     getDataFromFd(int fd);
+
         bool            sendDataToFd(const int fd, const std::string &data) const;
         
         void            updateFdsInSet(void);

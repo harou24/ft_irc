@@ -82,36 +82,64 @@ void            IrcClient::connectToServer(void)
                                         + " :" + this->realName + "\n");
     this->sendMsg(this->getServerFd(), user);
 }
-
-std::string* IrcClient::getReceivedMsg(void)
+/*
+void            IrcClient::readUserInput()
 {
-    std::string data = receiveMsg(this->getServerFd());
-    if (data.empty())
-        return (NULL);
-    return (new std::string(data));
+    for (std::string line; std::getline(std::cin, line);)
+    {
+        if (line == "/quit")
+        {
+            close(this->getServerFd());
+            exit(EXIT_SUCCESS);
+        }
+        std::cout << line << std::endl;
+        this->sendMsg(this->getServerFd(), line);
+        std::cout << GREEN << "User:> " << RESET;
+    }
 }
 
+void            IrcClient::receiveMsg()
+{
+    this->updateFdsInSet();
+    for (int fd = 0; fd <= this->TcpConnection::getFdMax(); fd++)
+    {
+        if (isFdReadyForCommunication(fd))
+        {
+            std::string data = this->TcpConnection::getDataFromFd(fd);
+            if (!data.empty())
+                std::cout << "data->" << data << std::endl;
+        }
+    }
+}
+*/
 void            IrcClient::runCommunicationWithServer(void)
 {
     while (true)
     {
-        std::cout << GREEN << this->nickName << ":> " << RESET;
-        for (std::string line; std::getline(std::cin, line);)
+        this->updateFdsInSet();
+        if (isFdReadyForCommunication(this->getServerFd()))
         {
-            if (this->TcpConnection::isFdReadyForCommunication(this->getServerFd()))
+            std::string data = this->TcpConnection::getDataFromFd(this->getServerFd());
+            if (!data.empty())
             {
-                std::string *data = getReceivedMsg();
-                if (data)
-                    std::cout << data << std::endl;
+                std::cout << BOLD_BLUE "server:> " << RESET << data;
             }
-            if (line == "/quit")
+        }
+        std::cout << "User :>\n";
+        if (isFdReadyForCommunication(STDIN_FILENO))
+        {
+            std::cout << "0 ready";
+            std::string line;
+            if (std::getline(std::cin, line))
             {
-                close(this->getServerFd());
-                exit(EXIT_SUCCESS);
+                if (line == "/quit")
+                {
+                    close(this->getServerFd());
+                    exit(EXIT_SUCCESS);
+                }
+                std::cout << line << std::endl;
+                this->sendMsg(this->getServerFd(), line);
             }
-            std::cout << line << std::endl;
-            this->sendMsg(this->getServerFd(), line);
-            std::cout << GREEN << "User:> " << RESET;
         }
     }
 }

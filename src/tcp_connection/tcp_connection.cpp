@@ -13,6 +13,7 @@
 
 #define MAX_PENDING_CONNECTION 10
 #define MAX_BUFF_SIZE 256
+#define TIMEOUT 5
 
 TcpConnection::TcpConnection(void)
 {
@@ -130,6 +131,9 @@ void    TcpConnection::init(e_fdType type)
     else if (type == TO_CONNECT)
     {
         this->connectingFd = this->getFd(TO_CONNECT, this->hostname, this->port);
+        addFdToSet(this->connectingFd, &this->masterFds);
+        addFdToSet(0, &this->masterFds);
+        this->setFdMax(this->connectingFd);
     }
 }
 
