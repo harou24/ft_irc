@@ -8,6 +8,8 @@ enum e_type
     NICK,
     USER,
     PRIVMSG,
+    MODE,
+    PING,
     UNKNOWN
 };
 
@@ -29,6 +31,17 @@ typedef struct  s_user
         std::string serverName;
         std::string realName;
 }                t_user;
+
+typedef struct s_userMode
+{
+    std::string nickName;
+    std::string mode;
+}               t_userMode;
+
+typedef struct  s_ping
+{
+    std::string hostName;
+}               t_ping;
 
 typedef struct  s_unknown
 {
@@ -56,6 +69,8 @@ class CmdParser : public Parser {
         t_nick      getNick(void) const;
         t_user      getUser(void) const;
         t_privMsg   getPrivMsg(void) const;
+        t_userMode  getUserMode(void) const;
+        t_ping      getPing(void) const;
         t_unknown   getUnknown(void) const;
 
         std::vector<std::string>        getTokens(void);

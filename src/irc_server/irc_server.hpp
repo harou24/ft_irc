@@ -1,8 +1,8 @@
 #ifndef IRC_SERVER_HPP
 # define IRC_SERVER_HPP
 
-# include "../irc_client/irc_client.hpp"
 # include "../server/server.hpp"
+# include "../irc_client/irc_client.hpp"
 # include "../cmd_parser/cmd_parser.hpp"
 # include "../message/message.hpp"
 
@@ -25,10 +25,12 @@ class IrcServer {
         bool    userExists(const std::string &nickName) const;
         void    handleLastReceivedMessage(std::vector<Message*>::iterator lastMsg);
         
-        void    nick(const t_nick &nick);
-        void    privMsg(const t_privMsg &privMsg);
-        void    user(const t_user &user);
-        void    unknown(const t_unknown &unknown);
+        std::string     nick(const t_nick &nick);
+        std::string     userMode(const t_userMode &mode);
+        std::string     pong(const t_ping &ping);
+        void            privMsg(const t_privMsg &privMsg);
+        void            user(const t_user &user);
+        void            unknown(const t_unknown &unknown);
         
         const Server&   getServer(void) const;
         IrcClient*      getUserByFd(const int fd);

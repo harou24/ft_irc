@@ -46,6 +46,10 @@ void        CmdParser::setType(void)
         this->type = USER;
     else if (this->cmd.find("PRIVMSG") != std::string::npos)
         this->type = PRIVMSG;
+    else if (this->cmd.find("MODE") != std::string::npos)
+        this->type = MODE;
+    else if (this->cmd.find("PING") != std::string::npos)
+        this->type = PING;
     else
         this->type = UNKNOWN;
 }
@@ -77,6 +81,20 @@ t_privMsg     CmdParser::getPrivMsg(void) const
     return (privmsg);
 }
 
+t_userMode  CmdParser::getUserMode(void) const
+{
+    t_userMode mode;
+    mode.nickName = this->Parser::removeSpaces(tokens[1]);
+    mode.mode = this->Parser::removeSpaces(tokens[2]);
+    return (mode);
+}
+
+t_ping  CmdParser::getPing(void) const
+{
+    t_ping ping;
+    ping.hostName = this->Parser::removeSpaces(tokens[1]);
+    return (ping);
+}
 t_unknown  CmdParser::getUnknown(void) const
 {
     t_unknown unknown;
@@ -98,6 +116,10 @@ void    CmdParser::debug(void) const
         std::cerr << "|USER|";
     else if (this->type == PRIVMSG)
         std::cerr << "|PRIVMSG|";
+    else if (this->type == MODE)
+        std::cerr << "|MODE|";
+    else if (this->type == PING)
+        std::cerr << "|PING|";
     else
         std::cerr << "|UNKNOWN|";
     std::cerr << RESET << std::endl;

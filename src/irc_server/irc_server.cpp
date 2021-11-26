@@ -3,6 +3,7 @@
 #include "../client/ostream_client.hpp"
 
 #include "../tcp_connection/tcp_connection.hpp"
+#include "../tcp_connection/tcp_utils.hpp"
 
 IrcServer::IrcServer(void)
     : server(new Server()), users(new std::map<std::string, IrcClient*>()) { }
@@ -29,27 +30,28 @@ IrcClient*  IrcServer::getUserByFd(const int fd)
     return (usr);
 }
 
-void    IrcServer::nick(const t_nick &nick)
+std::string    IrcServer::nick(const t_nick &nick)
 {
+        std::string reply;
         Client *c = server->getClients()->rbegin()->second;
         if (!c)
         {
-            return ;
+            return (reply);
         }
         IrcClient *cl = getUserByFd(c->getFd());
         if (cl == NULL)
         {
+            reply = ":" + getHostName() + " 001 " + nick.nickName + " :welcome to irc server :)\n";
             cl = new IrcClient(*c);
-            cl->setNickName(nick.nickName);
             this->users->insert(std::pair<std::string, IrcClient*>(nick.nickName, cl));
         }
         else
         {
-            std::string reply = ":" + cl->getNickName() + " NICK " + nick.nickName + "\n";
-            std::cerr << "sending msg to client : " << reply << std::endl;
-            this->server->sendMsg(cl->getFd(), reply);
-            cl->setNickName(nick.nickName);
+            reply = ":" + cl->getNickName() + " NICK " + nick.nickName + "\n";
         }
+        cl->setNickName(nick.nickName);
+        this->server->sendMsg(cl->getFd(), reply);
+        return (reply);
 }
 
 void    IrcServer::user(const t_user &user)
@@ -63,6 +65,32 @@ void    IrcServer::user(const t_user &user)
         cl->setServerName(user.serverName);
         cl->setRealName(user.realName);
     }
+}
+
+std::string    IrcServer::userMode(const t_userMode &userMode)
+{
+    std::string reply;
+    if (this->users->find(userMode.nickName) != this->users->end())
+    {
+        Client c = *(server->getClients()->rbegin()->second);
+        IrcClient *cl = this->getUserByFd(c.getFd());
+        reply = "MODE " + userMode.nickName + " " + userMode.mode + "\n";
+        std::cout << RED << "SEND->" << reply << " to->" << cl->getFd() << RESET << std::endl;
+        this->server->sendMsg(cl->getFd(), reply);
+    }
+    return (reply);
+}
+
+std::string     IrcServer::pong(const t_ping &ping)
+{
+    std::string reply;
+    Client c = *(server->getClients()->rbegin()->second);
+    IrcClient *cl = this->getUserByFd(c.getFd());
+    if (!cl)
+        return (reply);
+    reply = "PONG " + ping.hostName + "\n";
+    this->server->sendMsg(cl->getFd(), reply);
+    return (reply);
 }
 
 void    IrcServer::handleLastReceivedMessage(std::vector<Message*>::iterator lastMsg )
@@ -80,7 +108,16 @@ void    IrcServer::handleLastReceivedMessage(std::vector<Message*>::iterator las
         t_user user = cmd.getUser();
         this->user(user);
     }
-    
+    else if (cmd.getType() == MODE)
+    {
+        t_userMode userMode = cmd.getUserMode();
+        this->userMode(userMode);
+    }
+    else if (cmd.getType() == PING)
+    {
+        t_ping ping = cmd.getPing();
+        this->pong(ping);
+    }
     else if (cmd.getType() == PRIVMSG)
     {
         t_privMsg privMsg = cmd.getPrivMsg();

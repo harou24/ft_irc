@@ -79,6 +79,23 @@ TEST_CASE("getPrivMsg() with spaces at the end", "[CMD_PARSER]")
     REQUIRE(priv.msg == "this is the message !");
 }
 
+TEST_CASE("getUserMode()", "[CMD_PARSER]")
+{
+    CmdParser cmd("MODE nick +i");
+    t_userMode mode = cmd.getUserMode();
+    REQUIRE(cmd.getType() == MODE);
+    REQUIRE(mode.nickName == "nick");
+    REQUIRE(mode.mode == "+i");
+}
+
+TEST_CASE("getPing()", "[CMD_PARSER]")
+{
+    CmdParser cmd("PING hostName");
+    t_ping ping = cmd.getPing();
+    REQUIRE(cmd.getType() == PING);
+    REQUIRE(ping.hostName == "hostName");
+}
+
 TEST_CASE("getUnknown()", "[CMD_PARSER]")
 {
     CmdParser cmd("PRIVM :this is the message !");

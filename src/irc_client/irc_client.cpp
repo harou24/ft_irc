@@ -82,6 +82,8 @@ void            IrcClient::connectToServer(void)
                                 + this->hostName + " " 
                                     + this->serverName 
                                         + " :" + this->realName + "\n");
+    user += "MODE " + this->nickName + " +i\n";
+    user += "PING " + this->nickName + "\n";
     this->sendMsg(this->getServerFd(), user);
 }
 
