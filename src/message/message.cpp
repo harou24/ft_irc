@@ -4,9 +4,16 @@ Message::Message(void) : data("default"), hasBeenRead(false) { }
 
 Message::Message(const std::string &data) : data(data), hasBeenRead(false) { }
 
+Message::Message(Client *cl, const std::string &time, const std::string &data)
+    : sentBy(cl), time(time), data(data), hasBeenRead(false) { }
+
 Message::Message(const Message &m) : data(m.data), hasBeenRead(m.hasBeenRead) { }
 
 Message::~Message(void) { }
+
+Client*  Message::getSender(void) { return (this->sentBy); }
+
+std::string Message::getTime(void) const { return (this->time); }
 
 std::string Message::getData(void) const { return (this->data); }
 

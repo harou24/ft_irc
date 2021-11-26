@@ -54,7 +54,6 @@ void    Server::handleNewClient(void)
     {
         std::cerr << e.what() << std::endl;
     }
-    sendGreetingMsg(cl);
     this->clients->insert(std::pair<int, Client*>(cl->getFd(), cl));
     this->nbConnectedClients++;
 }
@@ -108,11 +107,11 @@ void    Server::handleClientData(const int fd)
             std::vector<std::string> msgs = p.split(data, '\n');
             for (std::vector<std::string>::iterator cmd = msgs.begin(); cmd != msgs.end(); cmd++)
             {
-                this->messages->push_back(new Message(*cmd));
+                this->messages->push_back(new Message(cl, this->getLocalTime(), *cmd));
             }
         }
         else
-            this->messages->push_back(new Message(data));
+            this->messages->push_back(new Message(cl, this->getLocalTime(), data));
         cl->setData(data);
     }
 }

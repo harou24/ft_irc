@@ -5,7 +5,7 @@
 #include <sstream>
 #include <map>
 
-std::ostream &operator << (std::ostream &output , const IrcServer &s)
+std::ostream &operator << (std::ostream &output , IrcServer &s)
 {
     
     if (s.getUsers()->size() > 0)
@@ -41,6 +41,10 @@ std::ostream &operator << (std::ostream &output , const IrcServer &s)
     {
         output << "\n\n";
         putChar(output, ' ', 5);
+        output << "TIME";
+        putChar(output, ' ', 6);
+        output << "SENT BY";
+        putChar(output, ' ', 6);
         output << "MESSAGES\n";
         putChar(output, ' ', 5);
         putChar(output, '-', 91);
@@ -52,6 +56,10 @@ std::ostream &operator << (std::ostream &output , const IrcServer &s)
         while (iBegin != iEnd)
         {
             Message *msg =  *iBegin;
+            putChar(output, ' ', 5);
+            output << msg->getTime().substr(0, 5);
+            putChar(output, ' ', 5);
+            output << GREEN <<s.getUserByFd(msg->getSender()->getFd())->getNickName() << RESET;
             putChar(output, ' ', 5);
             output << msg->getData() << "\n";
             iBegin++;

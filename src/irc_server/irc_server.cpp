@@ -76,7 +76,7 @@ std::string    IrcServer::userMode(const t_userMode &userMode)
         IrcClient *cl = this->getUserByFd(c.getFd());
         reply = "MODE " + userMode.nickName + " " + userMode.mode + "\n";
         std::cout << RED << "SEND->" << reply << " to->" << cl->getFd() << RESET << std::endl;
-        this->server->sendMsg(cl->getFd(), reply);
+       // this->server->sendMsg(cl->getFd(), reply);
     }
     return (reply);
 }

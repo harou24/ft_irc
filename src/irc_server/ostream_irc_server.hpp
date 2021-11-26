@@ -6,7 +6,7 @@
 # include "irc_server.hpp"
 # include "../utils/colors.h"
 
-std::ostream &operator << (std::ostream &output, const IrcServer &s);
+std::ostream &operator << (std::ostream &output, IrcServer &s);
 
 
 #endif
