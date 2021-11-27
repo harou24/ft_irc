@@ -30,15 +30,13 @@ IrcClient*  IrcServer::getUserByFd(const int fd)
     return (usr);
 }
 
-std::string    IrcServer::nick(const CmdParser &cmd)
+std::string    IrcServer::nick(std::vector<Message*>::iterator lastMsg )
 {
         std::string reply;
-        t_nick nick = cmd.getNick();
+        t_nick nick = (*lastMsg)->getCmd().getNick();
         Client *c = server->getClients()->rbegin()->second;
         if (!c)
-        {
             return (reply);
-        }
         IrcClient *cl = getUserByFd(c->getFd());
         if (cl == NULL)
         {
@@ -54,10 +52,10 @@ std::string    IrcServer::nick(const CmdParser &cmd)
         return (reply);
 }
 
-std::string    IrcServer::user(const CmdParser &cmd)
+std::string    IrcServer::user(std::vector<Message*>::iterator lastMsg )
 {
     std::string reply;
-    t_user user = cmd.getUser();
+    t_user user = (*lastMsg)->getCmd().getUser();
     Client c = *(server->getClients()->rbegin()->second);
     IrcClient *cl = this->getUserByFd(c.getFd());
     if (cl)
@@ -70,10 +68,10 @@ std::string    IrcServer::user(const CmdParser &cmd)
     return (reply);
 }
 
-std::string    IrcServer::userMode(const CmdParser &cmd)
+std::string    IrcServer::userMode(std::vector<Message*>::iterator lastMsg )
 {
     std::string reply;
-    t_userMode userMode = cmd.getUserMode();
+    t_userMode userMode = (*lastMsg)->getCmd().getUserMode();
     if (this->users->find(userMode.nickName) != this->users->end())
     {
         reply = "MODE " + userMode.nickName + " " + userMode.mode + "\n";
@@ -81,9 +79,9 @@ std::string    IrcServer::userMode(const CmdParser &cmd)
     return (reply);
 }
 
-std::string     IrcServer::pong(const CmdParser &cmd)
+std::string     IrcServer::pong(std::vector<Message*>::iterator lastMsg )
 {
-    t_ping ping = cmd.getPing();
+    t_ping ping = (*lastMsg)->getCmd().getPing();
     std::string reply;
     Client c = *(server->getClients()->rbegin()->second);
     IrcClient *cl = this->getUserByFd(c.getFd());
@@ -93,36 +91,36 @@ std::string     IrcServer::pong(const CmdParser &cmd)
     return (reply);
 }
 
-std::string IrcServer::privMsg(const CmdParser &cmd)
+std::string IrcServer::privMsg(std::vector<Message*>::iterator lastMsg )
 {
     std::string reply;
-    t_privMsg privMsg = cmd.getPrivMsg();
+    t_privMsg privMsg = (*lastMsg)->getCmd().getPrivMsg();
     return (reply);
 }
 
-std::string IrcServer::unknown(const CmdParser &cmd)
+std::string IrcServer::unknown(std::vector<Message*>::iterator lastMsg )
 {
     std::string reply;
-    t_unknown unknown = cmd.getUnknown();
+    t_unknown unknown = (*lastMsg)->getCmd().getUnknown();
     reply.assign(unknown.error);
     return (reply);
 }
 
-std::string IrcServer::execCmd(const CmdParser &cmd)
+std::string IrcServer::execCmd(std::vector<Message*>::iterator lastMsg )
 {
     std::string reply;
-    if (cmd.getType() == NICK)
-        reply = this->nick(cmd);
-    else if (cmd.getType() == USER)
-        this->user(cmd);
-    else if (cmd.getType() == MODE)
-        this->userMode(cmd);
-    else if (cmd.getType() == PING)
-        reply = this->pong(cmd);
-    else if (cmd.getType() == PRIVMSG)
-        reply = this->privMsg(cmd);
+    if ((*lastMsg)->getCmd().getType() == NICK)
+        reply = this->nick(lastMsg);
+    else if ((*lastMsg)->getCmd().getType() == USER)
+        this->user(lastMsg);
+    else if ((*lastMsg)->getCmd().getType() == MODE)
+        this->userMode(lastMsg);
+    else if ((*lastMsg)->getCmd().getType() == PING)
+        reply = this->pong(lastMsg);
+    else if ((*lastMsg)->getCmd().getType() == PRIVMSG)
+        reply = this->privMsg(lastMsg);
     else
-        reply = this->unknown(cmd);
+        reply = this->unknown(lastMsg);
     return (reply);
 }
 
@@ -131,7 +129,7 @@ void    IrcServer::handleLastReceivedMessage(std::vector<Message*>::iterator las
     std::string command = (*lastMsg)->getData();
     CmdParser cmd = CmdParser(command);
     cmd.debug();
-    std::string reply = this->execCmd(cmd);
+    std::string reply = this->execCmd(lastMsg);
     if (!reply.empty())
         this->server->sendMsg((*lastMsg)->getSender()->getFd(), reply);
     (*lastMsg)->setRead(true);

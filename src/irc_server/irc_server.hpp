@@ -3,7 +3,6 @@
 
 # include "../server/server.hpp"
 # include "../irc_client/irc_client.hpp"
-# include "../cmd_parser/cmd_parser.hpp"
 # include "../message/message.hpp"
 
 # include <map>
@@ -26,14 +25,14 @@ class IrcServer {
         bool    userExists(const std::string &nickName) const;
         void    handleLastReceivedMessage(std::vector<Message*>::iterator lastMsg);
 
-        std::string     execCmd(const CmdParser &cmd);
+        std::string     execCmd(std::vector<Message*>::iterator lastMsg);
         
-        std::string     nick(const CmdParser &cmd);
-        std::string     userMode(const CmdParser &cmd);
-        std::string     pong(const CmdParser &cmd);
-        std::string     privMsg(const CmdParser &cmd);
-        std::string     user(const CmdParser &cmd);
-        std::string     unknown(const CmdParser &cmd);
+        std::string     nick(std::vector<Message*>::iterator lastMsg);
+        std::string     userMode(std::vector<Message*>::iterator lastMsg);
+        std::string     pong(std::vector<Message*>::iterator lastMsg);
+        std::string     privMsg(std::vector<Message*>::iterator lastMsg);
+        std::string     user(std::vector<Message*>::iterator lastMsg);
+        std::string     unknown(std::vector<Message*>::iterator lastMsg);
         
         const Server&   getServer(void) const;
         IrcClient*      getUserByFd(const int fd);
