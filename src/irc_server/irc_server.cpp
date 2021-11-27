@@ -30,9 +30,10 @@ IrcClient*  IrcServer::getUserByFd(const int fd)
     return (usr);
 }
 
-std::string    IrcServer::nick(const t_nick &nick)
+std::string    IrcServer::nick(const CmdParser &cmd)
 {
         std::string reply;
+        t_nick nick = cmd.getNick();
         Client *c = server->getClients()->rbegin()->second;
         if (!c)
         {
@@ -50,12 +51,13 @@ std::string    IrcServer::nick(const t_nick &nick)
             reply = ":" + cl->getNickName() + " NICK " + nick.nickName + "\n";
         }
         cl->setNickName(nick.nickName);
-        this->server->sendMsg(cl->getFd(), reply);
         return (reply);
 }
 
-void    IrcServer::user(const t_user &user)
+std::string    IrcServer::user(const CmdParser &cmd)
 {
+    std::string reply;
+    t_user user = cmd.getUser();
     Client c = *(server->getClients()->rbegin()->second);
     IrcClient *cl = this->getUserByFd(c.getFd());
     if (cl)
@@ -65,31 +67,62 @@ void    IrcServer::user(const t_user &user)
         cl->setServerName(user.serverName);
         cl->setRealName(user.realName);
     }
+    return (reply);
 }
 
-std::string    IrcServer::userMode(const t_userMode &userMode)
+std::string    IrcServer::userMode(const CmdParser &cmd)
 {
     std::string reply;
+    t_userMode userMode = cmd.getUserMode();
     if (this->users->find(userMode.nickName) != this->users->end())
     {
-        Client c = *(server->getClients()->rbegin()->second);
-        IrcClient *cl = this->getUserByFd(c.getFd());
         reply = "MODE " + userMode.nickName + " " + userMode.mode + "\n";
-        std::cout << RED << "SEND->" << reply << " to->" << cl->getFd() << RESET << std::endl;
-       // this->server->sendMsg(cl->getFd(), reply);
     }
     return (reply);
 }
 
-std::string     IrcServer::pong(const t_ping &ping)
+std::string     IrcServer::pong(const CmdParser &cmd)
 {
+    t_ping ping = cmd.getPing();
     std::string reply;
     Client c = *(server->getClients()->rbegin()->second);
     IrcClient *cl = this->getUserByFd(c.getFd());
     if (!cl)
         return (reply);
     reply = "PONG " + ping.hostName + "\n";
-    this->server->sendMsg(cl->getFd(), reply);
+    return (reply);
+}
+
+std::string IrcServer::privMsg(const CmdParser &cmd)
+{
+    std::string reply;
+    t_privMsg privMsg = cmd.getPrivMsg();
+    return (reply);
+}
+
+std::string IrcServer::unknown(const CmdParser &cmd)
+{
+    std::string reply;
+    t_unknown unknown = cmd.getUnknown();
+    reply.assign(unknown.error);
+    return (reply);
+}
+
+std::string IrcServer::execCmd(const CmdParser &cmd)
+{
+    std::string reply;
+    if (cmd.getType() == NICK)
+        reply = this->nick(cmd);
+    else if (cmd.getType() == USER)
+        this->user(cmd);
+    else if (cmd.getType() == MODE)
+        this->userMode(cmd);
+    else if (cmd.getType() == PING)
+        reply = this->pong(cmd);
+    else if (cmd.getType() == PRIVMSG)
+        reply = this->privMsg(cmd);
+    else
+        reply = this->unknown(cmd);
     return (reply);
 }
 
@@ -98,36 +131,9 @@ void    IrcServer::handleLastReceivedMessage(std::vector<Message*>::iterator las
     std::string command = (*lastMsg)->getData();
     CmdParser cmd = CmdParser(command);
     cmd.debug();
-    if (cmd.getType() == NICK)
-    {
-        t_nick nick = cmd.getNick();
-        this->nick(nick);
-    }
-    else if (cmd.getType() == USER)
-    {
-        t_user user = cmd.getUser();
-        this->user(user);
-    }
-    else if (cmd.getType() == MODE)
-    {
-        t_userMode userMode = cmd.getUserMode();
-        this->userMode(userMode);
-    }
-    else if (cmd.getType() == PING)
-    {
-        t_ping ping = cmd.getPing();
-        this->pong(ping);
-    }
-    else if (cmd.getType() == PRIVMSG)
-    {
-        t_privMsg privMsg = cmd.getPrivMsg();
-        privMsg.msg = privMsg.msg;
-    }
-    else
-    {
-        t_unknown unknown = cmd.getUnknown();
-        unknown.error = unknown.error;
-    }
+    std::string reply = this->execCmd(cmd);
+    if (!reply.empty())
+        this->server->sendMsg((*lastMsg)->getSender()->getFd(), reply);
     (*lastMsg)->setRead(true);
 }
 

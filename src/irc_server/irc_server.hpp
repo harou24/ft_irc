@@ -14,6 +14,7 @@ class IrcServer {
     private:
         Server *server;
         std::map<std::string, IrcClient*> *users;
+
     public:
         IrcServer(void);
         IrcServer(const char *port);
@@ -24,13 +25,15 @@ class IrcServer {
         void    handleUnreadMessages(void);
         bool    userExists(const std::string &nickName) const;
         void    handleLastReceivedMessage(std::vector<Message*>::iterator lastMsg);
+
+        std::string     execCmd(const CmdParser &cmd);
         
-        std::string     nick(const t_nick &nick);
-        std::string     userMode(const t_userMode &mode);
-        std::string     pong(const t_ping &ping);
-        void            privMsg(const t_privMsg &privMsg);
-        void            user(const t_user &user);
-        void            unknown(const t_unknown &unknown);
+        std::string     nick(const CmdParser &cmd);
+        std::string     userMode(const CmdParser &cmd);
+        std::string     pong(const CmdParser &cmd);
+        std::string     privMsg(const CmdParser &cmd);
+        std::string     user(const CmdParser &cmd);
+        std::string     unknown(const CmdParser &cmd);
         
         const Server&   getServer(void) const;
         IrcClient*      getUserByFd(const int fd);
