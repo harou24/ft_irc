@@ -11,7 +11,7 @@ Message::Message(const Message &m) : data(m.data), hasBeenRead(m.hasBeenRead) { 
 
 Message::~Message(void) { }
 
-Client*  Message::getSender(void) { return (this->sentBy); }
+Client&  Message::getSender(void) const { return (*(this->sentBy)); }
 
 std::string Message::getTime(void) const { return (this->time); }
 

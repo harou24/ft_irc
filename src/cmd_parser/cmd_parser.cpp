@@ -50,6 +50,8 @@ void        CmdParser::setType(void)
         this->type = MODE;
     else if (this->cmd.find("PING") != std::string::npos)
         this->type = PING;
+    else if (this->cmd.find("WHOIS") != std::string::npos)
+        this->type = PING;
     else
         this->type = UNKNOWN;
 }
@@ -95,6 +97,14 @@ t_ping  CmdParser::getPing(void) const
     ping.hostName = this->Parser::removeSpaces(tokens[1]);
     return (ping);
 }
+
+t_whoIs  CmdParser::getWhoIs(void) const
+{
+    t_whoIs who;
+    who.nickName = this->Parser::removeSpaces(tokens[1]);
+    return (who);
+}
+
 t_unknown  CmdParser::getUnknown(void) const
 {
     t_unknown unknown;
@@ -120,6 +130,8 @@ void    CmdParser::debug(void) const
         std::cerr << "|MODE|";
     else if (this->type == PING)
         std::cerr << "|PING|";
+    else if (this->type == WHOIS)
+        std::cerr << "|WHOIS|";
     else
         std::cerr << "|UNKNOWN|";
     std::cerr << RESET << std::endl;

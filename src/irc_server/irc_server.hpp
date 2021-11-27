@@ -32,6 +32,7 @@ class IrcServer {
         std::string     pong(std::vector<Message*>::iterator lastMsg);
         std::string     privMsg(std::vector<Message*>::iterator lastMsg);
         std::string     user(std::vector<Message*>::iterator lastMsg);
+        std::string     whoIs(std::vector<Message*>::iterator lastMsg);
         std::string     unknown(std::vector<Message*>::iterator lastMsg);
         
         const Server&   getServer(void) const;
