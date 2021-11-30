@@ -126,11 +126,23 @@ std::string  Server::getClientIp(struct sockaddr_storage *remoteAddr)
     return (ip);
 }
 
+
+std::string  Server::getClientHost(struct sockaddr_storage *remoteAddr)
+{
+    const char *host = inet_ntoa(((struct sockaddr_in*)remoteAddr)->sin_addr);
+    if (!host)
+        strerror(errno);
+    std::string hostName(host);
+    return (hostName);
+}
+
 void    Server::acceptClientConnection(Client *cl)
 {
     struct sockaddr_storage remoteAddr;
     int fd = this->acceptConnection(&remoteAddr);
     std::string ip = this->getClientIp(&remoteAddr);
+    std::string host = getClientHost(&remoteAddr);
+    std::cout << "HOST->"<< RED << host << std::endl;
     cl->setIp(ip);
     cl->setFd(fd);
     cl->setConnected(true);

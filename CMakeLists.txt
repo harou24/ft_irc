@@ -31,6 +31,7 @@ add_library(ft_irc src/server/server.cpp
                     src/utils/output_utils.cpp
                     src/cmd_parser/cmd_parser.cpp
                     src/message/message.cpp
+                    src/commands/commands.cpp
                     src/parser/parser.cpp)
 
 add_subdirectory(apps)

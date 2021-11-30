@@ -51,7 +51,7 @@ void        CmdParser::setType(void)
     else if (this->cmd.find("PING") != std::string::npos)
         this->type = PING;
     else if (this->cmd.find("WHOIS") != std::string::npos)
-        this->type = PING;
+        this->type = WHOIS;
     else
         this->type = UNKNOWN;
 }

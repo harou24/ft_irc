@@ -27,14 +27,11 @@ class IrcServer {
 
         std::string     execCmd(std::vector<Message*>::iterator lastMsg);
         
-        std::string     nick(std::vector<Message*>::iterator lastMsg);
-        std::string     userMode(std::vector<Message*>::iterator lastMsg);
-        std::string     pong(std::vector<Message*>::iterator lastMsg);
-        std::string     privMsg(std::vector<Message*>::iterator lastMsg);
-        std::string     user(std::vector<Message*>::iterator lastMsg);
-        std::string     whoIs(std::vector<Message*>::iterator lastMsg);
-        std::string     unknown(std::vector<Message*>::iterator lastMsg);
-        
+        bool            isNickInUse(const std::string &nickName);
+
+        void            addUser(const std::string &nickName, IrcClient *cl);
+        void            removeUser(const std::string &nickName);
+
         const Server&   getServer(void) const;
         IrcClient*      getUserByFd(const int fd);
 

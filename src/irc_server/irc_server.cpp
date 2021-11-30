@@ -5,6 +5,8 @@
 #include "../tcp_connection/tcp_connection.hpp"
 #include "../tcp_connection/tcp_utils.hpp"
 
+#include "../commands/commands.hpp"
+
 IrcServer::IrcServer(void)
     : server(new Server()), users(new std::map<std::string, IrcClient*>()) { }
 
@@ -16,6 +18,18 @@ IrcServer::~IrcServer(void) { }
 bool    IrcServer::userExists(const std::string &nickName) const
 {
     return(this->users->find(nickName) != this->users->end());
+}
+
+void        IrcServer::addUser(const std::string &nickName, IrcClient *cl)
+{
+    this->users->insert(std::pair<std::string, IrcClient*>(nickName, cl));
+}
+
+void        IrcServer::removeUser(const std::string &nickName)
+{
+    std::map<std::string, IrcClient*>::iterator user = this->users->find(nickName);
+    if (user != this->users->end())
+        this->users->erase(user);
 }
 
 IrcClient*  IrcServer::getUserByFd(const int fd)
@@ -30,105 +44,29 @@ IrcClient*  IrcServer::getUserByFd(const int fd)
     return (usr);
 }
 
-std::string    IrcServer::nick(std::vector<Message*>::iterator lastMsg)
+bool    IrcServer::isNickInUse(const std::string &nickName)
 {
-        std::string reply;
-
-        t_nick nick = (*lastMsg)->getCmd().getNick();
-        Client c = (*lastMsg)->getSender();
-        IrcClient *cl = getUserByFd(c.getFd());
-        if (cl == NULL)
-        {
-            reply = ":" + getHostName() + " 001 " + nick.nickName + " :Welcome to irc server :)\n";
-            cl = new IrcClient(c);
-            this->users->insert(std::pair<std::string, IrcClient*>(nick.nickName, cl));
-        }
-        else
-        {
-            reply = ":" + getHostName() + " 001 " + nick.nickName + " :Welcome to irc server :)\n";
-            reply += ":" + cl->getNickName() + " NICK " + nick.nickName + "\n";
-        }
-        cl->setNickName(nick.nickName);
-        return (reply);
-}
-
-std::string    IrcServer::user(std::vector<Message*>::iterator lastMsg)
-{
-    std::string reply;
-    t_user user = (*lastMsg)->getCmd().getUser();
-    Client c = *(server->getClients()->rbegin()->second);
-    IrcClient *cl = this->getUserByFd(c.getFd());
-    if (cl)
-    {
-        cl->setUserName(user.userName);
-        cl->setHostName(user.hostName);
-        cl->setServerName(user.serverName);
-        cl->setRealName(user.realName);
-    }
-    return (reply);
-}
-
-std::string    IrcServer::userMode(std::vector<Message*>::iterator lastMsg)
-{
-    std::string reply;
-    t_userMode userMode = (*lastMsg)->getCmd().getUserMode();
-    if (this->users->find(userMode.nickName) != this->users->end())
-    {
-        reply = "MODE " + userMode.nickName + " " + userMode.mode + "\n";
-    }
-    return (reply);
-}
-
-std::string     IrcServer::pong(std::vector<Message*>::iterator lastMsg)
-{
-    t_ping ping = (*lastMsg)->getCmd().getPing();
-    std::string reply;
-    Client c = (*lastMsg)->getSender();
-    IrcClient *cl = this->getUserByFd(c.getFd());
-    if (!cl)
-        return (reply);
-    reply = "PONG " + ping.hostName + "\n";
-    return (reply);
-}
-
-std::string IrcServer::privMsg(std::vector<Message*>::iterator lastMsg)
-{
-    std::string reply;
-    t_privMsg privMsg = (*lastMsg)->getCmd().getPrivMsg();
-    return (reply);
-}
-
-std::string IrcServer::whoIs(std::vector<Message*>::iterator lastMsg)
-{
-    std::string reply;
-    t_whoIs who = (*lastMsg)->getCmd().getWhoIs();
-    reply.assign(who.nickName);
-    return (reply);
-}
-
-std::string IrcServer::unknown(std::vector<Message*>::iterator lastMsg)
-{
-    std::string reply;
-    t_unknown unknown = (*lastMsg)->getCmd().getUnknown();
-    reply.assign(unknown.error);
-    return (reply);
+    return (this->users->find(nickName) != this->users->end());
 }
 
 std::string IrcServer::execCmd(std::vector<Message*>::iterator lastMsg)
 {
     std::string reply;
     if ((*lastMsg)->getCmd().getType() == NICK)
-        reply = this->nick(lastMsg);
+        reply = nick(this, lastMsg);
     else if ((*lastMsg)->getCmd().getType() == USER)
-        this->user(lastMsg);
+        user(this, lastMsg);
     else if ((*lastMsg)->getCmd().getType() == MODE)
-        this->userMode(lastMsg);
+        userMode(this, lastMsg);
     else if ((*lastMsg)->getCmd().getType() == PING)
-        reply = this->pong(lastMsg);
+        reply = pong(this, lastMsg);
     else if ((*lastMsg)->getCmd().getType() == PRIVMSG)
-        reply = this->privMsg(lastMsg);
+        reply = privMsg(this, lastMsg);
+    else if ((*lastMsg)->getCmd().getType() == WHOIS)
+        reply = whoIs(this, lastMsg);
     else
-        reply = this->unknown(lastMsg);
+        reply = unknown(this, lastMsg);
+    std::cerr << "REPLY->" << reply << std::endl;
     return (reply);
 }
 
