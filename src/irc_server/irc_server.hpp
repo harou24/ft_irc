@@ -26,17 +26,18 @@ class IrcServer {
         void    handleLastReceivedMessage(std::vector<Message*>::iterator lastMsg);
 
         std::string     execCmd(std::vector<Message*>::iterator lastMsg);
-        
         bool            isNickInUse(const std::string &nickName);
 
         void            addUser(const std::string &nickName, IrcClient *cl);
         void            removeUser(const std::string &nickName);
 
-        const Server&   getServer(void) const;
+        Server&   getServer(void) const;
         IrcClient*      getUserByFd(const int fd);
 
         std::map<std::string, IrcClient*>*  getUsers(void) const;
         std::vector<Message*>::iterator     getLastUnreadMsg(void);
+
+        void    removeClientWithReply(const Client *cl, const std::string &reply);
 };
 
 #endif

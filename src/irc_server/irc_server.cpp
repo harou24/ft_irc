@@ -7,6 +7,8 @@
 
 #include "../commands/commands.hpp"
 
+#include <unistd.h>
+
 IrcServer::IrcServer(void)
     : server(new Server()), users(new std::map<std::string, IrcClient*>()) { }
 
@@ -70,7 +72,7 @@ std::string IrcServer::execCmd(std::vector<Message*>::iterator lastMsg)
     return (reply);
 }
 
-void    IrcServer::handleLastReceivedMessage(std::vector<Message*>::iterator lastMsg)
+void IrcServer::handleLastReceivedMessage(std::vector<Message*>::iterator lastMsg)
 {
     std::string command = (*lastMsg)->getData();
     CmdParser cmd = CmdParser(command);
@@ -91,6 +93,9 @@ void    IrcServer::updateUsersStatus(void)
         {
             it->second->setConnected(false);
             std::cout << "Connection lost with -> " << RED << it->second->getNickName() << RESET << "\n\n";
+            close(it->second->getFd());
+            this->removeUser(it->second->getNickName());
+            break ;
         }
         else
             it->second->setConnected(true);
@@ -106,7 +111,9 @@ void    IrcServer::handleUnreadMessages(void)
         while (unreadMsg != msgEnd)
         {
             if (!((*unreadMsg)->hasItBeenRead()))
+            {
                 this->handleLastReceivedMessage(unreadMsg);
+            }
             unreadMsg++;
         }
     }
@@ -117,11 +124,17 @@ void    IrcServer::start(void)
     this->server->TcpConnection::init(TcpConnection::TO_LISTEN);
     while (true)
     {
-        this->server->runOnce();
         this->updateUsersStatus();
+        this->server->runOnce();
         this->handleUnreadMessages();
         std::cerr << *this;
     }
+}
+
+void    IrcServer::removeClientWithReply(const Client *cl, const std::string &reply)
+{
+    this->server->sendMsg(cl->getFd(), reply);
+    this->server->handleClientRemoval(cl);
 }
 
 std::map<std::string, IrcClient*>* IrcServer::getUsers(void) const
@@ -129,5 +142,5 @@ std::map<std::string, IrcClient*>* IrcServer::getUsers(void) const
     return (this->users);
 }
 
-const Server&  IrcServer::getServer(void) const { return (*(this->server)); }
+Server&  IrcServer::getServer(void) const { return (*(this->server)); }
 

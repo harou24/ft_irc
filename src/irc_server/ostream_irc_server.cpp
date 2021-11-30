@@ -37,6 +37,31 @@ std::ostream &operator << (std::ostream &output , IrcServer &s)
             itBegin++;
         }
     }
+    if (s.getServer().getClients()->size() > 0)
+    {
+        output << "\n\n";
+        putChar(output, ' ', 5);
+        output << "FD";
+        putChar(output, ' ', 6);
+        output << "DATA SENT\n";
+        putChar(output, ' ', 5);
+        putChar(output, '-', 91);
+        putChar(output, '\n', 1);
+        std::map<int, Client*>::iterator iBegin;
+        std::map<int, Client*>::iterator iEnd;
+        iBegin  = s.getServer().getClients()->begin();
+        iEnd = s.getServer().getClients()->end();
+        while (iBegin != iEnd)
+        {
+            Client *c =  (*iBegin).second;
+            putChar(output, ' ', 5);
+            output << c->getFd();
+            putChar(output, ' ', 5);
+            output << c->getData() << "\n";
+            iBegin++;
+        }
+    }
+    output << std::endl;
     if (s.getServer().getMessages()->size() > 0)
     {
         output << "\n\n";

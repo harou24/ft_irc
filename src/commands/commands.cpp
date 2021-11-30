@@ -1,6 +1,8 @@
 #include "commands.hpp"
 #include "../utils/colors.h"
 
+#include <unistd.h>
+
 static std::string getNickErrorReply(IrcServer *s, t_nick nick)
 {
     std::string reply;
@@ -15,13 +17,16 @@ static std::string getNickErrorReply(IrcServer *s, t_nick nick)
 
 std::string    nick(IrcServer *s, std::vector<Message*>::iterator cmd)
 {
-        t_nick nick = (*cmd)->getCmd().getNick();
-        if (nick.nickName.empty() || nick.nickName.size() > NICK_MAX_LEN || s->isNickInUse(nick.nickName))
-            return (getNickErrorReply(s, nick));
-
         std::string reply;
+        t_nick nick = (*cmd)->getCmd().getNick();
+        
         Client c = (*cmd)->getSender();
         IrcClient *cl = s->getUserByFd(c.getFd());
+        
+        if (nick.nickName.empty() || nick.nickName.size() > NICK_MAX_LEN || s->isNickInUse(nick.nickName))
+        {
+            return (getNickErrorReply(s, nick));
+        }
         if (cl == NULL)
         {
             cl = new IrcClient(c);
@@ -50,6 +55,12 @@ std::string    user(IrcServer *s, std::vector<Message*>::iterator cmd)
         cl->setHostName(user.hostName);
         cl->setServerName(user.serverName);
         cl->setRealName(user.realName);
+    }
+    else
+    {
+        std::map<int, Client*>::iterator it = s->getServer().getClients()->find(c.getFd());
+        if (it != s->getServer().getClients()->end())
+            s->getServer().handleClientRemoval(it->second);
     }
     return (reply);
 }

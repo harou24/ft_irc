@@ -40,6 +40,7 @@ void    Server::sendGreetingMsg(const Client *cl) const
 
 void    Server::sendMsg(const int fd, const std::string &msg) const
 {
+    std::cout << "MESSAGE->" << msg << std::endl;
     this->sendDataToFd(fd, msg);
 }
 
@@ -69,14 +70,19 @@ void    Server::removeClient(const Client *cl)
 {
         std::map<int, Client*>::iterator it;
         it = this->clients->find(cl->getFd());
-        this->clients->erase(it);
+        if (it != this->clients->end())
+            this->clients->erase(it);
 }
 
 void    Server::handleClientRemoval(const Client *cl)
 {
-        close(cl->getFd());
+    if (cl)
+    {
         removeFdFromSet(cl->getFd(), this->getMasterFds());
         this->removeClient(cl);
+        close(cl->getFd());
+        cl = NULL;
+    }
 }
 
 void    Server::handleClientData(const int fd)
@@ -112,7 +118,8 @@ void    Server::handleClientData(const int fd)
         }
         else
             this->messages->push_back(new Message(cl, this->getLocalTime(), data));
-        cl->setData(data);
+        if (cl)
+            cl->setData(data);
     }
 }
 
