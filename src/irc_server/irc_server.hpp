@@ -29,7 +29,7 @@ class IrcServer {
         bool            isNickInUse(const std::string &nickName);
 
         void            addUser(const std::string &nickName, IrcClient *cl);
-        void            removeUser(const std::string &nickName);
+        IrcClient*      removeUser(const std::string &nickName);
 
         Server&   getServer(void) const;
         IrcClient*      getUserByFd(const int fd);

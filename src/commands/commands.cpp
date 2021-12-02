@@ -1,7 +1,10 @@
 #include "commands.hpp"
 #include "../utils/colors.h"
+#include "../client/ostream_client.hpp"
 
 #include <unistd.h>
+
+#include "../irc_client/ostream_irc_client.cpp"
 
 static std::string getNickErrorReply(IrcServer *s, t_nick nick)
 {
@@ -21,22 +24,23 @@ std::string    nick(IrcServer *s, std::vector<Message*>::iterator cmd)
         t_nick nick = (*cmd)->getCmd().getNick();
         
         Client c = (*cmd)->getSender();
-        IrcClient *cl = s->getUserByFd(c.getFd());
+        std::cerr << c << std::endl;
+        IrcClient *cl;
         
         if (nick.nickName.empty() || nick.nickName.size() > NICK_MAX_LEN || s->isNickInUse(nick.nickName))
         {
             reply = getNickErrorReply(s, nick);
         }
-        else if (cl == NULL)
+        if (!s->isNickInUse(nick.nickName))
         {
-            cl = new IrcClient(c);
+            cl = new IrcClient(&c, nick.nickName);
+            std::cout << "IRC->"<< *cl << std::endl;
             s->addUser(nick.nickName, cl);
             reply = ":" + getHostName() + " " + RPL_WELCOME + " " + nick.nickName + " :Welcome to irc server.\n";
-            cl->setNickName(nick.nickName);
         }
         else
         {
-            s->removeUser(cl->getNickName());
+            cl = s->removeUser(nick.nickName);
             s->addUser(nick.nickName, cl);
             reply += ":" + cl->getNickName() + " NICK " + nick.nickName + "\n";
             cl->setNickName(nick.nickName);
@@ -91,7 +95,7 @@ std::string privMsg(IrcServer *s, std::vector<Message*>::iterator cmd)
     if (!s->isNickInUse(privMsg.nickName))
         return ":" + getHostName() + " " + ERR_NOSUCHNICK + " " + sender->getNickName() + " "
                 + privMsg.nickName + " :No such nick\n";
-    if (s->isNickInUse(privMsg.nickName) && !s->getUsers()->find(privMsg.nickName)->second->isConnected())
+    if (s->isNickInUse(privMsg.nickName) && !s->getUsers()->find(privMsg.nickName)->second->getClient()->isConnected())
         return ":" + getHostName() + " " + ERR_NOSUCHNICK + " " + sender->getNickName()  + " "
                 + privMsg.nickName + " :Nick not available, try again later.\n";
     if (privMsg.msg.empty())
@@ -101,7 +105,7 @@ std::string privMsg(IrcServer *s, std::vector<Message*>::iterator cmd)
     {
         reply = ":" + sender->getNickName() + "!" + sender->getNickName() + "@" + sender->getServerName()
                 + "PRIVMSG " + privMsg.nickName + " " + privMsg.msg + "\n";
-        s->getServer().sendMsg(s->getUsers()->find(privMsg.nickName)->second->getFd(), reply);
+        s->getServer().sendMsg(s->getUsers()->find(privMsg.nickName)->second->getClient()->getFd(), reply);
     }
     return ("");
 }

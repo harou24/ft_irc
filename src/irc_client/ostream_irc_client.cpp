@@ -6,7 +6,7 @@
 std::ostream &operator << (std::ostream &output , const IrcClient &cl)
 {
     putChar(output, ' ', 5);
-    if (cl.isConnected())
+    if (cl.getClient().isConnected())
         output << GREEN;
     else
         output << RED;
@@ -21,7 +21,7 @@ std::ostream &operator << (std::ostream &output , const IrcClient &cl)
     putChar(output, ' ', 7);
     output << cl.getRealName();
     putChar(output, ' ', 4);
-    if (cl.isConnected())
+    if (cl.getClient().isConnected())
     {
         output << GREEN;
         output << "connected";

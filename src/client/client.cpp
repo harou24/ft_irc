@@ -17,6 +17,7 @@ Client::Client(const Client &cl) : TcpConnection()
     this->fd = cl.fd;
     this->ip = cl.ip;
     this->data = cl.data;
+    std::cout << this << std::endl;
 }
 
 Client::~Client(void){ }
@@ -27,7 +28,6 @@ Client& Client::operator = (const Client &cl)
     this->fd = cl.fd;
     this->ip = cl.ip;
     this->data = cl.data;
-    return (*this);
 }
 
 void            Client::sendMsg(const int fd, std::string &msg) { this->sendDataToFd(fd, msg); }

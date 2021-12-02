@@ -9,113 +9,16 @@
 
 #define LOGIN_SIZE 20
 
-IrcClient::IrcClient(void) : Client(), nickName("default"),
-    userName("default"), hostName("default"), serverName("default"), realName("default")
-{ }
 
-IrcClient::IrcClient(const char *hostName, const char *port) :
-    Client(hostName, port), nickName("default"),
-    userName("default"), hostName("default"), serverName("default"), realName("default")
-{
-    this->serverName = std::string(hostName);
-    struct passwd *user = this->getUserInfo();
-    this->nickName = user->pw_name;
-    this->hostName = user->pw_name;
-    this->userName = user->pw_name;
-    this->realName = user->pw_gecos;
-}
+IrcClient::IrcClient(void) { }
 
-IrcClient::IrcClient(const std::string &nickName,
-                        const std::string &userName,
-                            const std::string &hostName,
-                                const std::string &serverName,
-                                    const std::string &realName)
-    : Client()
-{
-    this->nickName = nickName;
-    this->userName = userName;
-    this->hostName = hostName;
-    this->serverName = serverName;
-    this->realName = realName;
-}
-
-IrcClient::IrcClient(const IrcClient &cl ) : Client(cl)
+IrcClient::IrcClient(Client *cl, const std::string &nickName) 
 { 
-    this->nickName = cl.nickName;
-    this->userName = cl.userName;
-    this->hostName = cl.hostName;
-    this->serverName = cl.serverName;
+    this->cl = cl;
+    this->nickName = nickName;
 }
-
-IrcClient::IrcClient(const Client &cl ) : Client(cl) { }
 
 IrcClient::~IrcClient(void) { }
-
-IrcClient& IrcClient::operator = (const IrcClient &cl)
-{
-    this->setConnected(cl.isConnected());
-    this->setFd(cl.getFd());
-    this->setIp(cl.getIp());
-    this->setData(cl.getData());
-    this->nickName = cl.nickName;
-    this->userName = cl.userName;
-    this->hostName = cl.hostName;
-    this->serverName = cl.serverName;
-    this->realName = cl.realName;
-    return (*this);
-}
-
-struct passwd*  IrcClient::getUserInfo(void)
-{
-    char    login[LOGIN_SIZE];
-    memset(login, 0, LOGIN_SIZE);
-    getlogin_r(login, LOGIN_SIZE) ;
-    return (getpwnam(login));
-}
-
-void            IrcClient::connectToServer(void)
-{
-    this->init(TO_CONNECT);
-    std::string nick("NICK " + this->nickName + "\n");
-    this->sendMsg(this->getServerFd(), nick);
-    std::string user("USER " + this->nickName + " "
-                                + this->hostName + " " 
-                                    + this->serverName 
-                                        + " :" + this->realName + "\n");
-    user += "MODE " + this->nickName + " +i\n";
-    user += "PING " + this->nickName + "\n";
-    this->sendMsg(this->getServerFd(), user);
-}
-
-void            IrcClient::runCommunicationWithServer(void)
-{
-    while (true)
-    {
-        this->updateFdsInSet();
-        if (isFdReadyForCommunication(this->getServerFd()))
-        {
-            std::string data = this->TcpConnection::getDataFromFd(this->getServerFd());
-            if (!data.empty())
-            {
-                std::cout << BOLD_BLUE "server:> " << RESET << data;
-            }
-        }
-        if (isFdReadyForCommunication(STDIN_FILENO))
-        {
-            std::string line;
-            if (std::getline(std::cin, line))
-            {
-                if (line == "/quit")
-                {
-                    close(this->getServerFd());
-                    exit(EXIT_SUCCESS);
-                }
-                std::cout << line << std::endl;
-                this->sendMsg(this->getServerFd(), line);
-            }
-        }
-    }
-}
 
 void            IrcClient::setNickName(const std::string &nickName)
 {
@@ -152,16 +55,20 @@ std::string     IrcClient::getServerName(void) const { return (this->serverName)
 
 std::string     IrcClient::getRealName(void) const { return (this->realName); }
 
+const Client&     IrcClient::getClient(void) const { return (*(this->cl)); }
+
+Client*     IrcClient::getClient(void) { return (this->cl); }
+
 void            IrcClient::debug(void) const
 {
     std::cerr << "::IRC_CLIENT_DEBUG::" << std::endl;
-    if (this->isConnected())
+    if (this->cl->isConnected())
         std::cerr << RED << "STATUS->" << GREEN << "|connected|" << RESET << std::endl;
     else
         std::cerr << RED << "STATUS->" << RED << "|disconnected|" << RESET << std::endl;
-    std::cerr << RED << "FD->" << GREEN << "|" << this->getFd() << "|" << RESET << std::endl;
-    std::cerr << RED << "IP->" << GREEN << "|" << this->getIp() << "|" << RESET << std::endl;
-    std::cerr << RED << "DATA_SENT->" << GREEN << "|" << this->getData() << "|" << RESET << std::endl;
+    std::cerr << RED << "FD->" << GREEN << "|" << this->cl->getFd() << "|" << RESET << std::endl;
+    std::cerr << RED << "IP->" << GREEN << "|" << this->cl->getIp() << "|" << RESET << std::endl;
+    std::cerr << RED << "DATA_SENT->" << GREEN << "|" << this->cl->getData() << "|" << RESET << std::endl;
     std::cerr << RED << "NICKNAME->" << GREEN << "|" << this->nickName << "|" << RESET << std::endl;
     std::cerr << RED << "USERNAME->" << GREEN << "|" << this->userName << "|" << RESET << std::endl;
     std::cerr << RED << "HOSTNAME->" << GREEN << "|" << this->hostName << "|" << RESET << std::endl;

@@ -5,8 +5,9 @@
 
 # include <iostream>
 
-class IrcClient : public Client {
+class IrcClient{
     private:
+        Client *cl;
         std::string nickName;
         std::string userName;
         std::string hostName;
@@ -15,20 +16,8 @@ class IrcClient : public Client {
 
     public:
         IrcClient(void);
-        IrcClient(const std::string &nickName);
-        IrcClient(const char *hostName, const char *port);
-        IrcClient(const std::string &nickName,
-                    const std::string &userName,
-                        const std::string &hostName,
-                            const std::string &serverName,
-                                const std::string &realName);
-        IrcClient(const IrcClient &cl);
-        IrcClient(const Client &cl);
+        IrcClient(Client *cl, const std::string &nickName);
         ~IrcClient(void);
-
-		IrcClient& operator = (const IrcClient &cl);
-        void            runCommunicationWithServer(void);
-        void            connectToServer(void);
 
         void            setNickName(const std::string &nickName);
         void            setUserName(const std::string &userName);
@@ -41,11 +30,11 @@ class IrcClient : public Client {
         std::string     getHostName(void) const;
         std::string     getServerName(void) const;
         std::string     getRealName(void) const;
-        
-        struct passwd    *getUserInfo(void);
 
+        const   Client&     getClient(void) const;
+        Client*             getClient(void);
+        
         void    debug(void) const;
-        std::string* getReceivedMsg(void);
 };
 
 #endif

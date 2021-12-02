@@ -22,28 +22,28 @@ bool    IrcServer::userExists(const std::string &nickName) const
     return(this->users->find(nickName) != this->users->end());
 }
 
-void        IrcServer::addUser(const std::string &nickName, IrcClient *cl)
-{
-    this->users->insert(std::pair<std::string, IrcClient*>(nickName, cl));
-}
-
-void        IrcServer::removeUser(const std::string &nickName)
-{
-    std::map<std::string, IrcClient*>::iterator user = this->users->find(nickName);
-    if (user != this->users->end())
-        this->users->erase(user);
-}
-
 IrcClient*  IrcServer::getUserByFd(const int fd)
 {
     IrcClient *usr = NULL;
     std::map<std::string, IrcClient*>::iterator it;
     for (it = this->users->begin(); it != this->users->end(); it++)
     {
-        if (it->second->getFd() == fd)
+        if (it->second->getClient()->getFd() == fd)
             usr = it->second;
     }
     return (usr);
+}
+
+void        IrcServer::addUser(const std::string &nickName, IrcClient *cl)
+{
+    this->users->insert(std::pair<std::string, IrcClient*>(nickName, cl));
+}
+
+IrcClient*        IrcServer::removeUser(const std::string &nickName)
+{
+    IrcClient *cl = this->users->find(nickName)->second;
+    this->users->erase(this->users->find(nickName));
+    return (cl);
 }
 
 bool    IrcServer::isNickInUse(const std::string &nickName)
@@ -56,6 +56,7 @@ std::string IrcServer::execCmd(std::vector<Message*>::iterator lastMsg)
     std::string reply;
     if ((*lastMsg)->getCmd().getType() == NICK)
         reply = nick(this, lastMsg);
+    /*
     else if ((*lastMsg)->getCmd().getType() == USER)
         user(this, lastMsg);
     else if ((*lastMsg)->getCmd().getType() == PING)
@@ -68,7 +69,7 @@ std::string IrcServer::execCmd(std::vector<Message*>::iterator lastMsg)
         reply = userMode(this, lastMsg);
     else
         reply = unknown(this, lastMsg);
-    std::cerr << "REPLY->" << reply << std::endl;
+    std::cerr << "REPLY->" << reply << std::endl;*/
     return (reply);
 }
 
@@ -81,25 +82,6 @@ void IrcServer::handleLastReceivedMessage(std::vector<Message*>::iterator lastMs
     if (!reply.empty())
         this->server->sendMsg((*lastMsg)->getSender().getFd(), reply);
     (*lastMsg)->setRead(true);
-}
-
-void    IrcServer::updateUsersStatus(void)
-{
-    std::map<std::string, IrcClient*>::iterator it;
-    for (it = this->users->begin(); it != this->users->end(); it++)
-    {
-        if (this->server->getClients()->find(it->second->getFd()) ==
-                                        this->server->getClients()->end())
-        {
-            it->second->setConnected(false);
-            std::cout << "Connection lost with -> " << RED << it->second->getNickName() << RESET << "\n\n";
-            close(it->second->getFd());
-            this->removeUser(it->second->getNickName());
-            break ;
-        }
-        else
-            it->second->setConnected(true);
-    }
 }
 
 void    IrcServer::handleUnreadMessages(void)
@@ -124,7 +106,6 @@ void    IrcServer::start(void)
     this->server->TcpConnection::init(TcpConnection::TO_LISTEN);
     while (true)
     {
-        this->updateUsersStatus();
         this->server->runOnce();
         this->handleUnreadMessages();
         std::cerr << *this;
