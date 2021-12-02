@@ -6,7 +6,6 @@
 
 # include <iostream>
 
-
 # include "../tcp_connection/tcp_connection.hpp"
 
 class Client : public TcpConnection {
@@ -19,9 +18,12 @@ class Client : public TcpConnection {
 
     public:
         Client(void);
-        Client(const int fd, const std::string &ip);
+        Client(const int fd);
         Client(const char *hostname, const char *port);
-        ~Client(void);
+        Client(const Client &ct);
+        virtual ~Client(void);
+
+        Client& operator = (const Client &cl);
         
         void                    sendMsg(const int fd, std::string &msg);
         std::string             receiveMsg(const int fd);
@@ -30,15 +32,14 @@ class Client : public TcpConnection {
         
         int                     getServerFd(void) const;
         int                     getFd(void) const;
-        std::string             getData(void) const;
-        std::string             getIp(void) const;
+        const std::string&      getData(void) const;
+        std::string      getIp(void) const;
         bool                    isConnected(void) const;
 
         void                    setIp(const std::string &newIp);
         void                    setFd(const int newFd);
         void                    setData(const std::string &data);
         void                    setConnected(const bool status);
-
 };
 
 #endif

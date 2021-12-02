@@ -3,6 +3,8 @@
 #configuration
 BUILD_FOLDER="build"
 SRC_FOLDER="src"
+APPS_FOLDER="apps"
+TESTS_FOLDER="tests/src"
 
 display_info ()
 {
@@ -13,6 +15,7 @@ display_info ()
     echo "  test               run unitests";
     echo "  create             generate .cpp/.hpp files, generate cpp module";
     echo "  save               create a save branch and push on github";
+    echo "  run                run executable in APPS_FOLDER";
 }
 
 
@@ -49,6 +52,18 @@ create_cpp_module ()
     cd $SRC_FOLDER/$1/;
     create_cpp_header "$1.hpp";
     create_cpp_file $1;
+}
+
+create_cpp_test ()
+{
+    echo "creating test $1 in $TESTS_FOLDER";
+    touch $TESTS_FOLDER/$1.cpp;
+    echo "#include <catch2/catch.hpp>" > $TESTS_FOLDER/$1.cpp;
+    printf "\n" >> $TESTS_FOLDER/$1.cpp;
+    echo "TEST_CASE(\"your test\", \"[TEST]\")" >> $TESTS_FOLDER/$1.cpp;
+    echo "{" >> $TESTS_FOLDER/$1.cpp;
+    echo "  REQUIRE(42 == 42);" >> $TESTS_FOLDER/$1.cpp ;
+    echo "}" >> $TESTS_FOLDER/$1.cpp;
 }
 
 run_cmake ()
@@ -88,7 +103,7 @@ if [ $# -eq 1 ]; then
     elif [ "$1" == "save" ]; then
         save
     else
-        echo "CMD NOT FOUND\n";
+        echo "NB_ARG Error : build | clean | test | -h / --help\n";
     fi
 elif [ $# -eq 2 ]; then
     if [ "$1" == "create" ]; then
@@ -100,6 +115,8 @@ elif [ $# -eq 3 ]; then
     if [ "$1" == "create" ]; then
         if [[ "$2" == "module" ]] && [ ! -d $2 ]; then
             create_cpp_module $3;
+        elif [[ "$2" == "test" ]] && [ ! -d $TESTS_FOLDER/$2 ]; then
+            create_cpp_test $3; 
         fi
     fi
 else

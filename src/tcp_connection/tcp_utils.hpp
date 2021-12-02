@@ -5,6 +5,8 @@
 #include <sys/select.h>
 #include <netdb.h>
 
+#include <iostream>
+
 void    *getInAddr(struct sockaddr *sa);
 void    setSockAddrConfig(struct addrinfo *hints);
 void    zeroFdSet(fd_set *set);
@@ -18,5 +20,7 @@ void                freeAddrInfo(struct addrinfo *addrinfo);
 
 int     assignAddrToFd(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
 int     connectFdToAddr(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+
+std::string     getHostName(void);
 
 #endif

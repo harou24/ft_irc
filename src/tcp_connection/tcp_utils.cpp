@@ -3,8 +3,12 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <errno.h>
+#include <unistd.h>
 
-#include <iostream>
+#ifndef HOST_NAME_MAX
+# define HOST_NAME_MAX 64
+#endif
 
 void    *getInAddr(struct sockaddr *sa)
 {
@@ -12,6 +16,16 @@ void    *getInAddr(struct sockaddr *sa)
         return &(((struct sockaddr_in*)sa)->sin_addr);
     }
     return &(((struct sockaddr_in6*)sa)->sin6_addr);
+}
+
+std::string         getHostName(void)
+{
+    char    buf[HOST_NAME_MAX];
+    memset(buf, 0, HOST_NAME_MAX);
+    std::string hostName;
+    if (gethostname(buf, HOST_NAME_MAX) == 0)
+        hostName.assign(buf);
+    return (hostName);
 }
 
 struct addrinfo     *getAddrInfo(const char *hostname, const char *servname)
@@ -67,7 +81,10 @@ void    dieWithMsg(const char *msg)
 
 int     assignAddrToFd(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 {
-    return(bind(sockfd, addr, addrlen));
+    int     ret = bind(sockfd, addr, addrlen);
+    if (ret == -1)
+        std::cout << "bind() error, value of errno is " << errno << "\nError : " << strerror(errno) << "\n";
+    return(ret);
 }
 
 int     connectFdToAddr(int sockfd, const struct sockaddr *addr, socklen_t addrlen)

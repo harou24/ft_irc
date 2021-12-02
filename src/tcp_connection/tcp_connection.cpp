@@ -1,6 +1,6 @@
 #include "tcp_connection.hpp"
-#include "tcp_utils.hpp"
 #include "tcp_exceptions.hpp"
+#include "tcp_utils.hpp"
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -9,8 +9,12 @@
 #include <stdio.h>
 #include <netdb.h>
 
+#include <errno.h>
+#include "../utils/colors.h"
+
 #define MAX_PENDING_CONNECTION 10
 #define MAX_BUFF_SIZE 256
+#define TIMEOUT 5
 
 TcpConnection::TcpConnection(void)
 {
@@ -89,8 +93,13 @@ int    TcpConnection::applyFunctionToAddresses(t_ptrToFunction function, struct 
         }
         break;
     }
+    freeAddrInfo(addresses);
     if (tmpAddrInfo == NULL)
+    {
+        close(this->connectingFd);
+        close(this->listenerFd);
         throw TcpAssignAddrToFdException();
+    }
     return (fd);
 }
 
@@ -107,7 +116,6 @@ int            TcpConnection::getFd(e_fdType type, const char *hostname, const c
         std::cerr << e.what();
     }
     int  fd = this->findFd(type, addrInfo);
-    freeAddrInfo(addrInfo);
     return (fd);
 }
 
@@ -124,6 +132,9 @@ void    TcpConnection::init(e_fdType type)
     else if (type == TO_CONNECT)
     {
         this->connectingFd = this->getFd(TO_CONNECT, this->hostname, this->port);
+        addFdToSet(this->connectingFd, &this->masterFds);
+        addFdToSet(0, &this->masterFds);
+        this->setFdMax(this->connectingFd);
     }
 }
 
@@ -153,9 +164,13 @@ std::string TcpConnection::getDataFromFd(int fd)
     if ((nbytes = read(fd, buf, sizeof(buf))) <= 0)
     {
         if (nbytes == 0)
-            std::cout << "TCP Connection lost !\n";
+            std::cout << BG_RED << "TCP Connection lost ! " << RESET << "\n";
         else
+        {
             std::cerr << "recv() error @_@\n";
+            std::cerr << strerror(errno) << std::endl;
+            return ("");
+        }
     }
     buf[nbytes] = '\0';
     std::string data(buf);

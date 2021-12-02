@@ -1,17 +1,34 @@
 #include "client.hpp"
+#include "../tcp_connection/tcp_connection.hpp"
 #include "../tcp_connection/tcp_utils.hpp"
-#include "../tcp_connection/tcp_exceptions.hpp"
 
 #include <string.h>
 
-Client::Client(void) : connected(false), fd(-1)  { }
+Client::Client(void) : TcpConnection(), connected(false), fd(-1), ip("default"), data("default")  { }
 
-Client::Client(const char *hostname, const char *port) : TcpConnection(hostname, port) { }
+Client::Client(const char *hostname, const char *port)
+: TcpConnection(hostname, port), connected(false), fd(-1), ip("default"), data("default") { }
 
-Client::Client(const int fd, const std::string &ip) : connected(false), fd(fd), ip(ip) { }
+Client::Client(const int fd) : connected(false), fd(fd), ip("default"), data("default") { }
+
+Client::Client(const Client &cl) : TcpConnection()
+{
+    this->connected = cl.connected;
+    this->fd = cl.fd;
+    this->ip = cl.ip;
+    this->data = cl.data;
+}
 
 Client::~Client(void){ }
 
+Client& Client::operator = (const Client &cl)
+{
+    this->connected = cl.connected;
+    this->fd = cl.fd;
+    this->ip = cl.ip;
+    this->data = cl.data;
+    return (*this);
+}
 
 void            Client::sendMsg(const int fd, std::string &msg) { this->sendDataToFd(fd, msg); }
 
@@ -26,9 +43,9 @@ int             Client::getServerFd(void) const { return (this->getConnectingFd(
 
 int             Client::getFd(void) const { return (this->fd); }
 
-std::string     Client::getIp(void) const { return (this->ip); }
+std::string    Client::getIp(void) const { return (this->ip); }
 
-std::string     Client::getData(void) const { return (this->data); }
+const std::string&     Client::getData(void) const { return (this->data); }
 
 bool            Client::isConnected(void) const { return (this->connected); }
 
@@ -37,7 +54,7 @@ void            Client::setData(const std::string &data) { this->data.assign(dat
 
 void            Client::setConnected(const bool status) { this->connected = status; }
 
-void            Client::setIp(const std::string &newIp) { this->ip = newIp; }
+void            Client::setIp(const std::string &newIp) { this->ip.assign(newIp); }
 
 void            Client::setFd(const int newFd) { this->fd = newFd; }
 
