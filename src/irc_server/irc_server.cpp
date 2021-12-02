@@ -58,14 +58,14 @@ std::string IrcServer::execCmd(std::vector<Message*>::iterator lastMsg)
         reply = nick(this, lastMsg);
     else if ((*lastMsg)->getCmd().getType() == USER)
         user(this, lastMsg);
-    else if ((*lastMsg)->getCmd().getType() == MODE)
-        userMode(this, lastMsg);
     else if ((*lastMsg)->getCmd().getType() == PING)
         reply = pong(this, lastMsg);
     else if ((*lastMsg)->getCmd().getType() == PRIVMSG)
         reply = privMsg(this, lastMsg);
     else if ((*lastMsg)->getCmd().getType() == WHOIS)
         reply = whoIs(this, lastMsg);
+    else if ((*lastMsg)->getCmd().getType() == MODE)
+        reply = userMode(this, lastMsg);
     else
         reply = unknown(this, lastMsg);
     std::cerr << "REPLY->" << reply << std::endl;

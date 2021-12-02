@@ -8,9 +8,9 @@ static std::string getNickErrorReply(IrcServer *s, t_nick nick)
     std::string reply;
     if (nick.nickName.empty())
         reply = ":" + getHostName() + " " + ERR_NONICKNAMEGIVEN + " * * "  + " :NickName is not given.\n";
-    if (nick.nickName.size() > NICK_MAX_LEN)
+    else if (nick.nickName.size() > NICK_MAX_LEN)
         reply = ":" + getHostName() + " " + ERR_ERRONEUSNICKNAME + " * * "  + " :NickName is not valid.\n";
-    if (s->isNickInUse(nick.nickName))
+    else if (s->isNickInUse(nick.nickName))
         reply = ":" + getHostName() + " " + ERR_NICKNAMEINUSE + " * " + nick.nickName + " :NickName is already in use.\n";
     return (reply);
 }
@@ -25,21 +25,22 @@ std::string    nick(IrcServer *s, std::vector<Message*>::iterator cmd)
         
         if (nick.nickName.empty() || nick.nickName.size() > NICK_MAX_LEN || s->isNickInUse(nick.nickName))
         {
-            return (getNickErrorReply(s, nick));
+            reply = getNickErrorReply(s, nick);
         }
-        if (cl == NULL)
+        else if (cl == NULL)
         {
             cl = new IrcClient(c);
             s->addUser(nick.nickName, cl);
             reply = ":" + getHostName() + " " + RPL_WELCOME + " " + nick.nickName + " :Welcome to irc server.\n";
+            cl->setNickName(nick.nickName);
         }
         else
         {
             s->removeUser(cl->getNickName());
             s->addUser(nick.nickName, cl);
             reply += ":" + cl->getNickName() + " NICK " + nick.nickName + "\n";
+            cl->setNickName(nick.nickName);
         }
-        cl->setNickName(nick.nickName);
         return (reply);
 }
 
@@ -55,12 +56,6 @@ std::string    user(IrcServer *s, std::vector<Message*>::iterator cmd)
         cl->setHostName(user.hostName);
         cl->setServerName(user.serverName);
         cl->setRealName(user.realName);
-    }
-    else
-    {
-        std::map<int, Client*>::iterator it = s->getServer().getClients()->find(c.getFd());
-        if (it != s->getServer().getClients()->end())
-            s->getServer().handleClientRemoval(it->second);
     }
     return (reply);
 }
