@@ -23,7 +23,7 @@ std::string    nick(IrcServer *s, std::vector<Message*>::iterator cmd)
         std::string reply;
         t_nick nick = (*cmd)->getCmd().getNick();
         
-        Client c = (*cmd)->getSender();
+        Client *c = (*cmd)->getSender();
         std::cerr << c << std::endl;
         IrcClient *cl;
         
@@ -33,7 +33,7 @@ std::string    nick(IrcServer *s, std::vector<Message*>::iterator cmd)
         }
         if (!s->isNickInUse(nick.nickName))
         {
-            cl = new IrcClient(&c, nick.nickName);
+            cl = new IrcClient(c, nick.nickName);
             std::cout << "IRC->"<< *cl << std::endl;
             s->addUser(nick.nickName, cl);
             reply = ":" + getHostName() + " " + RPL_WELCOME + " " + nick.nickName + " :Welcome to irc server.\n";
@@ -52,8 +52,8 @@ std::string    user(IrcServer *s, std::vector<Message*>::iterator cmd)
 {
     std::string reply;
     t_user user = (*cmd)->getCmd().getUser();
-    Client c = (*cmd)->getSender();
-    IrcClient *cl = s->getUserByFd(c.getFd());
+    Client *c = (*cmd)->getSender();
+    IrcClient *cl = s->getUserByFd(c->getFd());
     if (cl)
     {
         cl->setUserName(user.userName);
@@ -79,8 +79,8 @@ std::string     pong(IrcServer *s, std::vector<Message*>::iterator cmd)
 {
     t_ping ping = (*cmd)->getCmd().getPing();
     std::string reply;
-    Client c = (*cmd)->getSender();
-    IrcClient *cl = s->getUserByFd(c.getFd());
+    Client *c = (*cmd)->getSender();
+    IrcClient *cl = s->getUserByFd(c->getFd());
     if (!cl)
         return (reply);
     reply = "PONG " + ping.hostName + "\n";
@@ -91,7 +91,7 @@ std::string privMsg(IrcServer *s, std::vector<Message*>::iterator cmd)
 {
     std::string reply;
     t_privMsg privMsg = (*cmd)->getCmd().getPrivMsg();
-    IrcClient *sender = s->getUserByFd((*cmd)->getSender().getFd());
+    IrcClient *sender = s->getUserByFd((*cmd)->getSender()->getFd());
     if (!s->isNickInUse(privMsg.nickName))
         return ":" + getHostName() + " " + ERR_NOSUCHNICK + " " + sender->getNickName() + " "
                 + privMsg.nickName + " :No such nick\n";
@@ -114,8 +114,8 @@ std::string whoIs(IrcServer *s, std::vector<Message*>::iterator cmd)
 {
     std::string reply;
     //= ":server 311 <nick> <client> <username> <hostname> * <realname>";
-    Client c = (*cmd)->getSender();
-    IrcClient *cl = s->getUserByFd(c.getFd());
+    Client *c = (*cmd)->getSender();
+    IrcClient *cl = s->getUserByFd(c->getFd());
     t_whoIs who = (*cmd)->getCmd().getWhoIs();
     reply = ":" + getHostName() + " " + RPL_WHOISUSER + " " + cl->getNickName() + " " + who.nickName
             + cl->getUserName() + " " + cl->getHostName() + " * " + cl->getRealName();

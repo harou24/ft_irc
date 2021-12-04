@@ -56,7 +56,6 @@ std::string IrcServer::execCmd(std::vector<Message*>::iterator lastMsg)
     std::string reply;
     if ((*lastMsg)->getCmd().getType() == NICK)
         reply = nick(this, lastMsg);
-    /*
     else if ((*lastMsg)->getCmd().getType() == USER)
         user(this, lastMsg);
     else if ((*lastMsg)->getCmd().getType() == PING)
@@ -69,7 +68,7 @@ std::string IrcServer::execCmd(std::vector<Message*>::iterator lastMsg)
         reply = userMode(this, lastMsg);
     else
         reply = unknown(this, lastMsg);
-    std::cerr << "REPLY->" << reply << std::endl;*/
+    std::cerr << "REPLY->" << reply << std::endl;
     return (reply);
 }
 
@@ -80,7 +79,7 @@ void IrcServer::handleLastReceivedMessage(std::vector<Message*>::iterator lastMs
     cmd.debug();
     std::string reply = this->execCmd(lastMsg);
     if (!reply.empty())
-        this->server->sendMsg((*lastMsg)->getSender().getFd(), reply);
+        this->server->sendMsg((*lastMsg)->getSender()->getFd(), reply);
     (*lastMsg)->setRead(true);
 }
 

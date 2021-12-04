@@ -21,7 +21,7 @@ class Message {
         Message(const Message &m);
         ~Message(void);
 
-        Client&         getSender(void) const;
+        Client*         getSender(void) const;
         std::string     getTime(void) const;
         std::string     getData(void) const;
         bool            hasItBeenRead(void) const;

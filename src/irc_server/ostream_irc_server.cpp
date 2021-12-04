@@ -84,7 +84,7 @@ std::ostream &operator << (std::ostream &output , IrcServer &s)
             putChar(output, ' ', 5);
             output << msg->getTime().substr(0, 5);
             putChar(output, ' ', 5);
-            IrcClient *cl = s.getUserByFd(msg->getSender().getFd());
+            IrcClient *cl = s.getUserByFd(msg->getSender()->getFd());
             if (cl != NULL)
                 output << GREEN << cl->getNickName() << RESET;
             putChar(output, ' ', 5);
