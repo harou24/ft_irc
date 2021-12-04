@@ -27,22 +27,19 @@ std::string    nick(IrcServer *s, std::vector<Message*>::iterator cmd)
         t_nick nick = (*cmd)->getCmd().getNick();
         
         Client *c = (*cmd)->getSender();
-        IrcClient *cl;
-        
-        if (nick.nickName.empty() || nick.nickName.size() > NICK_MAX_LEN || s->isNickInUse(nick.nickName))
-        {
-            return getNickErrorReply(s, nick);
-        }
-        if (!s->isNickInUse(nick.nickName))
+        IrcClient *cl = s->getUserByFd(c->getFd());
+       
+        if (s->isNickInUse(nick.nickName))
+            return (getNickErrorReply(s, nick));
+        if (cl == NULL)
         {
             cl = new IrcClient(c, nick.nickName);
-            std::cout << "IRC->"<< *cl << std::endl;
             s->addUser(nick.nickName, cl);
             reply = ":" + getHostName() + " " + RPL_WELCOME + " " + nick.nickName + " :Welcome to irc server.\n";
         }
         else
         {
-            cl = s->removeUser(nick.nickName);
+            cl = s->removeUser(cl->getNickName());
             s->addUser(nick.nickName, cl);
             reply += ":" + cl->getNickName() + " NICK " + nick.nickName + "\n";
             cl->setNickName(nick.nickName);
