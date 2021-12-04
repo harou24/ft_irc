@@ -30,7 +30,10 @@ std::string    nick(IrcServer *s, std::vector<Message*>::iterator cmd)
         IrcClient *cl = s->getUserByFd(c->getFd());
        
         if (s->isNickInUse(nick.nickName))
+        {
+            //need to disconnect client here after returning
             return (getNickErrorReply(s, nick));
+        }
         if (cl == NULL)
         {
             cl = new IrcClient(c, nick.nickName);
@@ -92,14 +95,9 @@ std::string privMsg(IrcServer *s, std::vector<Message*>::iterator cmd)
     t_privMsg privMsg = (*cmd)->getCmd().getPrivMsg();
     IrcClient *sender = s->getUserByFd((*cmd)->getSender()->getFd());
     if (!s->isNickInUse(privMsg.nickName))
-        return ":" + getHostName() + " " + ERR_NOSUCHNICK + " " + sender->getNickName() + " "
-                + privMsg.nickName + " :No such nick\n";
+        return privMsg.nickName + " :No such nick\n";
     if (s->isNickInUse(privMsg.nickName) && !s->getUsers()->find(privMsg.nickName)->second->getClient()->isConnected())
-        return ":" + getHostName() + " " + ERR_NOSUCHNICK + " " + sender->getNickName()  + " "
-                + privMsg.nickName + " :Nick not available, try again later.\n";
-    if (privMsg.msg.empty())
-        return ":" + getHostName() + " " + ERR_NOTEXTTOSEND + " " + sender->getNickName()  + " "
-                + privMsg.nickName + " :No text to send.\n";
+        return  privMsg.nickName + ": not available, try again later.\n";
     if (s->isNickInUse(privMsg.nickName))
     {
         reply = ":" + sender->getNickName() + "!" + sender->getNickName() + "@" + sender->getServerName()
@@ -112,12 +110,10 @@ std::string privMsg(IrcServer *s, std::vector<Message*>::iterator cmd)
 std::string whoIs(IrcServer *s, std::vector<Message*>::iterator cmd)
 {
     std::string reply;
-    //= ":server 311 <nick> <client> <username> <hostname> * <realname>";
     Client *c = (*cmd)->getSender();
     IrcClient *cl = s->getUserByFd(c->getFd());
     t_whoIs who = (*cmd)->getCmd().getWhoIs();
-    reply = ":" + getHostName() + " " + RPL_WHOISUSER + " " + cl->getNickName() + " " + who.nickName
-            + cl->getUserName() + " " + cl->getHostName() + " * " + cl->getRealName();
+    reply = cl->getNickName() + " " + cl->getUserName() + " " + cl->getHostName() + " * :" + cl->getRealName() + "\n";
     std::cerr << RED << reply << RESET << std::endl;
     return (reply);
 }
