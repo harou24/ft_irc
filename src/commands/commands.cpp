@@ -10,11 +10,14 @@ static std::string getNickErrorReply(IrcServer *s, t_nick nick)
 {
     std::string reply;
     if (nick.nickName.empty())
-        reply = ":" + getHostName() + " " + ERR_NONICKNAMEGIVEN + " * * "  + " :NickName is not given.\n";
+        reply = ":" + getHostName() + " " + ERR_NONICKNAMEGIVEN
+                    + " * * "  + " :NickName is not given.\n";
     else if (nick.nickName.size() > NICK_MAX_LEN)
-        reply = ":" + getHostName() + " " + ERR_ERRONEUSNICKNAME + " * * "  + " :NickName is not valid.\n";
+        reply = ":" + getHostName() + " " + ERR_ERRONEUSNICKNAME
+                    + " * * "  + " :NickName is not valid.\n";
     else if (s->isNickInUse(nick.nickName))
-        reply = ":" + getHostName() + " " + ERR_NICKNAMEINUSE + " * " + nick.nickName + " :NickName is already in use.\n";
+        reply = ":" + getHostName() + " " + ERR_NICKNAMEINUSE
+                    + " * " + nick.nickName + " :NickName is already in use.\n";
     return (reply);
 }
 
@@ -24,12 +27,11 @@ std::string    nick(IrcServer *s, std::vector<Message*>::iterator cmd)
         t_nick nick = (*cmd)->getCmd().getNick();
         
         Client *c = (*cmd)->getSender();
-        std::cerr << c << std::endl;
         IrcClient *cl;
         
         if (nick.nickName.empty() || nick.nickName.size() > NICK_MAX_LEN || s->isNickInUse(nick.nickName))
         {
-            reply = getNickErrorReply(s, nick);
+            return getNickErrorReply(s, nick);
         }
         if (!s->isNickInUse(nick.nickName))
         {
