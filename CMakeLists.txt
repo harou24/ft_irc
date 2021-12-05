@@ -31,7 +31,14 @@ add_library(ft_irc src/server/server.cpp
                     src/utils/output_utils.cpp
                     src/cmd_parser/cmd_parser.cpp
                     src/message/message.cpp
-                    src/commands/commands.cpp
+                    src/commands/nick.cpp
+                    src/commands/user.cpp
+                    src/commands/mode.cpp
+                    src/commands/priv_msg.cpp
+                    src/commands/who_is.cpp
+                    src/commands/join.cpp
+                    src/commands/pong.cpp
+                    src/commands/unknown.cpp
                     src/channel/channel.cpp
                     src/parser/parser.cpp)
 
