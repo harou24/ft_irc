@@ -118,6 +118,25 @@ std::string whoIs(IrcServer *s, std::vector<Message*>::iterator cmd)
     return (reply);
 }
 
+std::string join(IrcServer *s, std::vector<Message*>::iterator cmd)
+{
+    std::string reply;
+    t_join join = (*cmd)->getCmd().getJoin();
+    Client *c = (*cmd)->getSender();
+    IrcClient *cl = s->getUserByFd(c->getFd());
+    if (!s->channelExists(join.channelName))
+    {
+        Channel *ch = new Channel(join.channelName, cl);
+        ch->addUser(cl);
+        s->addChannel(join.channelName, ch);
+        reply = join.channelName + " :No topic is set\n";
+    }
+    else
+    {
+    }
+    return (reply);
+}
+
 std::string unknown(IrcServer *s, std::vector<Message*>::iterator cmd)
 {
     std::string reply;

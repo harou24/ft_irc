@@ -20,6 +20,7 @@ std::string     pong(IrcServer *s, std::vector<Message*>::iterator lastMsg);
 std::string     privMsg(IrcServer *s, std::vector<Message*>::iterator lastMsg);
 std::string     user(IrcServer *s, std::vector<Message*>::iterator lastMsg);
 std::string     whoIs(IrcServer *s, std::vector<Message*>::iterator lastMsg);
+std::string     join(IrcServer *s, std::vector<Message*>::iterator lastMsg);
 std::string     unknown(IrcServer *s,std::vector<Message*>::iterator lastMsg);
 
 #endif

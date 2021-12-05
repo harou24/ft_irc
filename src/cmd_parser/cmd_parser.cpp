@@ -52,6 +52,8 @@ void        CmdParser::setType(void)
         this->type = PING;
     else if (this->cmd.find("WHOIS") != std::string::npos)
         this->type = WHOIS;
+    else if (this->cmd.find("JOIN") != std::string::npos)
+        this->type = JOIN;
     else
         this->type = UNKNOWN;
 }
@@ -62,6 +64,14 @@ t_nick     CmdParser::getNick(void) const
     nick.nickName = tokens[1];
     std::remove(nick.nickName.begin(), nick.nickName.end(), '\n');
     return (nick);
+}
+
+t_join     CmdParser::getJoin(void) const
+{
+    t_join join;
+    join.channelName = this->Parser::removeSpaces(tokens[1]);
+    std::remove(join.channelName.begin(), join.channelName.end(), '\n');
+    return (join);
 }
 
 t_user     CmdParser::getUser(void) const
@@ -132,6 +142,8 @@ void    CmdParser::debug(void) const
         std::cerr << "|PING|";
     else if (this->type == WHOIS)
         std::cerr << "|WHOIS|";
+    else if (this->type == JOIN)
+        std::cerr << "|JOIN|";
     else
         std::cerr << "|UNKNOWN|";
     std::cerr << RESET << std::endl;

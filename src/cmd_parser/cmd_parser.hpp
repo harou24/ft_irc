@@ -11,6 +11,7 @@ enum e_type
     MODE,
     PING,
     WHOIS,
+    JOIN,
     UNKNOWN
 };
 
@@ -49,6 +50,11 @@ typedef struct  s_whoIs
     std::string nickName;
 }               t_whoIs;
 
+typedef struct  s_join
+{
+    std::string channelName;
+}               t_join;
+
 typedef struct  s_unknown
 {
     std::string error;
@@ -78,6 +84,7 @@ class CmdParser : public Parser {
         t_userMode  getUserMode(void) const;
         t_ping      getPing(void) const;
         t_whoIs     getWhoIs(void) const;
+        t_join      getJoin(void) const;
         t_unknown   getUnknown(void) const;
 
         std::vector<std::string>        getTokens(void);

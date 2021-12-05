@@ -10,16 +10,25 @@
 #include <unistd.h>
 
 IrcServer::IrcServer(void)
-    : server(new Server()), users(new std::map<std::string, IrcClient*>()) { }
+    : server(new Server()), users(new std::map<std::string, IrcClient*>()),
+        channels(new std::map<std::string, Channel*>())
+{ }
 
 IrcServer::IrcServer(const char *port)
-    : server(new Server(port)), users(new std::map<std::string, IrcClient*>()) { }
+    : server(new Server(port)), users(new std::map<std::string, IrcClient*>()),
+        channels(new std::map<std::string, Channel*>())
+{ }
 
 IrcServer::~IrcServer(void) { }
 
 bool    IrcServer::userExists(const std::string &nickName) const
 {
-    return(this->users->find(nickName) != this->users->end());
+    return (this->users->find(nickName) != this->users->end());
+}
+
+bool    IrcServer::channelExists(const std::string &name) const
+{
+    return (this->channels->find(name) != this->channels->end());
 }
 
 IrcClient*  IrcServer::getUserByFd(const int fd)
@@ -37,6 +46,11 @@ IrcClient*  IrcServer::getUserByFd(const int fd)
 void        IrcServer::addUser(const std::string &nickName, IrcClient *cl)
 {
     this->users->insert(std::pair<std::string, IrcClient*>(nickName, cl));
+}
+
+void        IrcServer::addChannel(const std::string &name, Channel *channel)
+{
+    this->channels->insert(std::pair<std::string, Channel*>(name, channel));
 }
 
 IrcClient*        IrcServer::removeUser(const std::string &nickName)
@@ -66,6 +80,8 @@ std::string IrcServer::execCmd(std::vector<Message*>::iterator lastMsg)
         reply = whoIs(this, lastMsg);
     else if ((*lastMsg)->getCmd().getType() == MODE)
         reply = userMode(this, lastMsg);
+    else if ((*lastMsg)->getCmd().getType() == JOIN)
+        reply = join(this, lastMsg);
     else
         reply = unknown(this, lastMsg);
     std::cerr << "REPLY->" << reply << std::endl;
@@ -120,6 +136,11 @@ void    IrcServer::removeClientWithReply(const Client *cl, const std::string &re
 std::map<std::string, IrcClient*>* IrcServer::getUsers(void) const
 {
     return (this->users);
+}
+
+std::map<std::string, Channel*>* IrcServer::getChannels(void) const
+{
+    return (this->channels);
 }
 
 Server&  IrcServer::getServer(void) const { return (*(this->server)); }
