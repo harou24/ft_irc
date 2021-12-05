@@ -31,6 +31,14 @@ bool    IrcServer::channelExists(const std::string &name) const
     return (this->channels->find(name) != this->channels->end());
 }
 
+Channel*    IrcServer::getChannel(const std::string &name) const
+{
+    Channel *channel = NULL;
+    if (this->channelExists(name))
+        channel = this->channels->find(name)->second;
+    return (channel);
+}
+
 IrcClient*  IrcServer::getUserByFd(const int fd)
 {
     IrcClient *usr = NULL;

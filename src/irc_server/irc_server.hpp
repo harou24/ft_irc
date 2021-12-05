@@ -33,6 +33,7 @@ class IrcServer {
 
         void            addUser(const std::string &nickName, IrcClient *cl);
         void            addChannel(const std::string &name, Channel *channel);
+        Channel*        getChannel(const std::string &name) const;
         IrcClient*      removeUser(const std::string &nickName);
 
         Server&   getServer(void) const;

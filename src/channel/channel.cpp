@@ -1,5 +1,6 @@
 #include "channel.hpp"
 #include "../utils/colors.h"
+#include "../irc_client/ostream_irc_client.hpp"
 
 Channel::Channel(void)
 { 
@@ -70,4 +71,7 @@ void    Channel::debug(void) const
     std::cerr << RED << "OPERATOR->" << GREEN << "|" << this->chop->getNickName() << "|" << RESET << std::endl;
     std::cerr << RED << "TOPIC->" << GREEN << "|" << this->topic << "|" << RESET << std::endl;
     std::cerr << RED << "MODE->" << GREEN << "|" << this->mode << "|" << RESET << std::endl;
+    std::cerr << RED << "USERS:\n" << RESET;
+    for (size_t i = 0; i < this->users->size(); i++)
+        std::cerr << GREEN << this->users->at(i) << RESET << std::endl;
 }
