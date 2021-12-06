@@ -69,8 +69,13 @@ t_nick     CmdParser::getNick(void) const
 t_join     CmdParser::getJoin(void) const
 {
     t_join join;
-    join.channelName = this->Parser::removeSpaces(tokens[1]);
-    std::remove(join.channelName.begin(), join.channelName.end(), '\n');
+    if (this->tokens.size() == 2)
+    {
+        join.channelName = this->Parser::removeSpaces(tokens[1]);
+        std::remove(join.channelName.begin(), join.channelName.end(), '\n');
+    }
+    else
+        join.channelName = "";
     return (join);
 }
 
