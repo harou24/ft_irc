@@ -73,5 +73,5 @@ void    Channel::debug(void) const
     std::cerr << RED << "MODE->" << GREEN << "|" << this->mode << "|" << RESET << std::endl;
     std::cerr << RED << "USERS:\n" << RESET;
     for (size_t i = 0; i < this->users->size(); i++)
-        std::cerr << GREEN << this->users->at(i) << RESET << std::endl;
+        std::cerr << GREEN << *(this->users->at(i)) << RESET << std::endl;
 }

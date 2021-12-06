@@ -8,18 +8,20 @@ std::string join(IrcServer *s, std::vector<Message*>::iterator cmd)
     IrcClient *cl = s->getUserByFd(c->getFd());
     if (!cl)
         return ("");
+    Channel *channel;
     if (!s->channelExists(join.channelName))
     {
-        Channel *channel = new Channel(join.channelName, cl);
+        channel = new Channel(join.channelName, cl);
         channel->addUser(cl);
         s->addChannel(join.channelName, channel);
         reply = join.channelName + " :No topic is set.\n";
     }
     else
     {
-        Channel *channel = s->getChannel(join.channelName);
+        channel = s->getChannel(join.channelName);
         channel->addUser(cl);
         reply = join.channelName + " :" + channel->getTopic() + "\n";
     }
+    channel->debug();
     return (reply);
 }
