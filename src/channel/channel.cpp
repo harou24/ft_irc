@@ -64,6 +64,27 @@ std::string Channel::getTopic(void) const { return (this->topic); }
 
 std::string Channel::getMode(void) const { return (this->mode); }
 
+std::string    Channel::getChannelUsersAsString(void) const
+{
+    std::string usersNickList;
+    if (this->users->size() > 0)
+    {
+        std::vector<IrcClient*>::iterator user = this->users->begin();
+        std::vector<IrcClient*>::iterator last = this->users->end();
+        while (user != last)
+        {
+            if ((*user)->getNickName() == this->chop->getNickName())
+                usersNickList += "@";
+            usersNickList += (*user)->getNickName();
+            if (user != last - 1)
+                usersNickList += " ";
+            user++;
+        }
+    }
+    std::cerr << "LIST->|" << usersNickList << "|" << std::endl;
+    return (usersNickList);
+}
+
 void    Channel::debug(void) const
 {
     std::cerr << "::CHANNEL_DEBUG::\n";

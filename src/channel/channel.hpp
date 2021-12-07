@@ -32,6 +32,8 @@ class Channel {
             std::string getTopic(void) const;
             std::string getMode(void) const;
 
+            std::string getChannelUsersAsString(void) const;
+
             void    debug(void) const;
 };
 

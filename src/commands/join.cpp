@@ -1,5 +1,8 @@
 #include "commands.hpp"
 
+#define RPL_NAMREPLY 353
+#define RPL_ENDOFNAMES 366
+
 std::string join(IrcServer *s, std::vector<Message*>::iterator cmd)
 {
     std::string reply;
@@ -22,6 +25,17 @@ std::string join(IrcServer *s, std::vector<Message*>::iterator cmd)
         channel->addUser(cl);
         reply = join.channelName + " :" + channel->getTopic() + "\n";
     }
+    reply += ":" + cl->getNickName() + "!" + cl->getNickName() + "@" + cl->getHostName() + " JOIN "
+            + channel->getName() + "\n";
+    
+    reply += ":" + cl->getNickName() + "!" + cl->getNickName() + "@" + cl->getHostName() + " "
+            + std::to_string(RPL_NAMREPLY) + " " + cl->getNickName() + " = "
+            + channel->getName() + " :" + channel->getChannelUsersAsString() + " \n";
+    
+    reply += ":" + cl->getNickName() + "!" + cl->getNickName() + "@" + cl->getHostName() + " "
+            + std::to_string(RPL_ENDOFNAMES) + " " + cl->getNickName() + " "
+            + channel->getName() + " :End of /NAMES list.\n";
+
     channel->debug();
     return (reply);
 }

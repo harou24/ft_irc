@@ -25,6 +25,7 @@ class IrcServer {
         void    updateUsersStatus(void);
         void    handleUnreadMessages(void);
         bool    userExists(const std::string &nickName) const;
+        
         bool    channelExists(const std::string &name) const;
         void    handleLastReceivedMessage(std::vector<Message*>::iterator lastMsg);
 

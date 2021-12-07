@@ -86,8 +86,8 @@ std::string IrcServer::execCmd(std::vector<Message*>::iterator lastMsg)
         reply = privMsg(this, lastMsg);
     else if ((*lastMsg)->getCmd().getType() == WHOIS)
         reply = whoIs(this, lastMsg);
-    else if ((*lastMsg)->getCmd().getType() == MODE)
-        reply = userMode(this, lastMsg);
+//    else if ((*lastMsg)->getCmd().getType() == MODE)
+//        reply = userMode(this, lastMsg);
     else if ((*lastMsg)->getCmd().getType() == JOIN)
         reply = join(this, lastMsg);
     else
