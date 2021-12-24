@@ -1,7 +1,7 @@
 #include "commands.hpp"
 
-#define RPL_NAMREPLY 353
-#define RPL_ENDOFNAMES 366
+#define RPL_NAMREPLY "353"
+#define RPL_ENDOFNAMES "366"
 
 std::string join(IrcServer *s, std::vector<Message*>::iterator cmd)
 {
@@ -29,11 +29,11 @@ std::string join(IrcServer *s, std::vector<Message*>::iterator cmd)
             + channel->getName() + "\n";
     
     reply += ":" + cl->getNickName() + "!" + cl->getNickName() + "@" + cl->getHostName() + " "
-            + std::to_string(RPL_NAMREPLY) + " " + cl->getNickName() + " = "
+            + RPL_NAMREPLY + " " + cl->getNickName() + " = "
             + channel->getName() + " :" + channel->getChannelUsersAsString() + " \n";
     
     reply += ":" + cl->getNickName() + "!" + cl->getNickName() + "@" + cl->getHostName() + " "
-            + std::to_string(RPL_ENDOFNAMES) + " " + cl->getNickName() + " "
+            + RPL_ENDOFNAMES + " " + cl->getNickName() + " "
             + channel->getName() + " :End of /NAMES list.\n";
 
     channel->debug();

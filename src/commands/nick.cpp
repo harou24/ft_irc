@@ -46,7 +46,7 @@ static std::string  execNick(IrcServer *s,
 std::string    nick(IrcServer *s, std::vector<Message*>::iterator cmd)
 {
         t_nick nick = (*cmd)->getCmd().getNick();
-
+	std::cout << "FUCKING NICKNAME->" << "|" << nick.nickName << "|" << std::endl;
         if (s->isNickInUse(nick.nickName))
             return (getErrNickNameInUse(nick.nickName));
         if (nick.nickName.empty())

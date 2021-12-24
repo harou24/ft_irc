@@ -31,7 +31,6 @@ std::vector<std::string>    CmdParser::split(const std::string &cmd)
         }
         else
         {
-            std::remove(tmp.begin(), tmp.end(), ' ');
             tokens.push_back(tmp);
         }
     }
@@ -62,7 +61,6 @@ t_nick     CmdParser::getNick(void) const
 {
     t_nick nick;
     nick.nickName = tokens[1];
-    std::remove(nick.nickName.begin(), nick.nickName.end(), '\n');
     return (nick);
 }
 
@@ -72,7 +70,6 @@ t_join     CmdParser::getJoin(void) const
     if (this->tokens.size() == 2)
     {
         join.channelName = this->Parser::removeSpaces(tokens[1]);
-        std::remove(join.channelName.begin(), join.channelName.end(), '\n');
     }
     else
         join.channelName = "";
@@ -86,7 +83,6 @@ t_user     CmdParser::getUser(void) const
     user.hostName = this->Parser::removeSpaces(tokens[2]);
     user.serverName = this->Parser::removeSpaces(tokens[3]);
     user.realName = this->Parser::removeSpaces(tokens[4]);
-    std::remove(user.realName.begin(), user.realName.end(), '\n');
     return (user);
 }
 
