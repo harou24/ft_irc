@@ -2,11 +2,10 @@
 
 #include "../../src/irc_server/irc_server.cpp"
 
-TEST_CASE("userExists() with unknown user", "[TEST]")
+TEST_CASE("Running IrcServ Once", "[TEST]")
 {
-    IrcServer s;
-    IrcClient cl;
-    s.getUsers()->insert(std::pair<std::string, IrcClient*>(cl.getNickName(), &cl));
-    REQUIRE(s.userExists("hello") == false);
+	IrcServer irc("8080");
+	irc.init();
+	irc.runOnce();
 }
 

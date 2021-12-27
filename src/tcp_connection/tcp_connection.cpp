@@ -14,7 +14,8 @@
 
 #define MAX_PENDING_CONNECTION 10
 #define MAX_BUFF_SIZE 256
-#define TIMEOUT 5
+
+struct timeval TIMEOUT = {2, 0};
 
 TcpConnection::TcpConnection(void)
 {
@@ -186,10 +187,9 @@ bool        TcpConnection::sendDataToFd(const int fd, const std::string &data) c
 void    TcpConnection::updateFdsInSet(void)
 {
     this->readFds = this->masterFds;
-    if (select(this->fdMax + 1, &this->readFds, NULL, NULL, NULL) == -1)
+    if (select(this->fdMax + 1, &this->readFds, NULL, NULL, &TIMEOUT) == -1)
         throw TcpException();
 }
-
 
 fd_set  *TcpConnection::getReadFds(void) { return (&this->readFds); }
 

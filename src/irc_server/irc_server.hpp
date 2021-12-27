@@ -13,6 +13,7 @@
 class IrcServer {
     private:
         Server *server;
+	bool	isRunning;
         std::map<std::string, IrcClient*> *users;
         std::map<std::string, Channel*> *channels;
 
@@ -22,6 +23,10 @@ class IrcServer {
         ~IrcServer(void);
 
         void    start(void);
+	void	init(void);
+	void	runOnce(void);
+	void	stop(void);
+
         void    updateUsersStatus(void);
         void    handleUnreadMessages(void);
         bool    userExists(const std::string &nickName) const;

@@ -16,6 +16,7 @@
 
 #define WELCOME_MSG "------- Welcome to the server ! -------\n"
 
+#include <stdlib.h>
 
 Server::Server(void) :
     TcpConnection("8080"),
@@ -31,7 +32,9 @@ Server::Server(const char *port) :
                     messages(new std::vector<Message*>())
 { }
 
-Server::~Server(void) { }
+Server::~Server(void) 
+{
+}
 
 void    Server::sendGreetingMsg(const Client *cl) const
 {

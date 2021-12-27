@@ -91,7 +91,6 @@ std::ostream &operator << (std::ostream &output , IrcServer &s)
             output << msg->getData() << "\n";
             iBegin++;
         }
-        output << std::endl;
     }
 	return (output);
 }

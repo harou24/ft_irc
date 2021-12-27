@@ -8,18 +8,21 @@
 #include "../commands/commands.hpp"
 
 #include <unistd.h>
+#include <stdlib.h>
 
 IrcServer::IrcServer(void)
-    : server(new Server()), users(new std::map<std::string, IrcClient*>()),
+    : server(new Server()), isRunning(false), users(new std::map<std::string, IrcClient*>()),
         channels(new std::map<std::string, Channel*>())
 { }
 
 IrcServer::IrcServer(const char *port)
-    : server(new Server(port)), users(new std::map<std::string, IrcClient*>()),
+    : server(new Server(port)), isRunning(false), users(new std::map<std::string, IrcClient*>()),
         channels(new std::map<std::string, Channel*>())
 { }
 
-IrcServer::~IrcServer(void) { }
+IrcServer::~IrcServer(void)
+{
+}
 
 bool    IrcServer::userExists(const std::string &nickName) const
 {
@@ -124,15 +127,31 @@ void    IrcServer::handleUnreadMessages(void)
     }
 }
 
-void    IrcServer::start(void)
+void	IrcServer::stop(void)
+{
+	this->isRunning = false;
+	std::cout << "STOPING SERVER...\n";
+	//exit(0);
+}
+
+void	IrcServer::init(void)
 {
     this->server->TcpConnection::init(TcpConnection::TO_LISTEN);
-    while (true)
-    {
+}
+
+void	IrcServer::runOnce(void)
+{
         this->server->runOnce();
         this->handleUnreadMessages();
         std::cerr << *this;
-    }
+}
+
+void    IrcServer::start(void)
+{
+    this->init();
+    this->isRunning = true;
+    while (this->isRunning)
+        this->runOnce();
 }
 
 void    IrcServer::removeClientWithReply(const Client *cl, const std::string &reply)
